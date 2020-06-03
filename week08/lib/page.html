@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<div>
+    <a>
+        <div id="id" class="class class2"></div>
+    </a>
+</div>
+<script src="../node_modules/@ryanmorr/css-selector-parser/dist/parse.js"></script>
+<script>
+    function matchElement(attrs, element) {
+        if ('nodeName' in attrs) {
+            if (attrs.nodeName !== element.tagName.toLowerCase()) {
+                return false
+            }
+        }
+        if (!attrs.attributes.every(attribute => {
+            if (attribute.name !== 'class') {
+                if (element[attribute.name] !== attribute.value) {
+                    return false
+                }
+                return true
+            } else {
+                let hasClass = false
+                for (key of element.classList) {
+                    if (key === attribute.value) {
+                        hasClass = true
+                    }
+                }
+                return hasClass
+            }
+        })) {
+            return false
+        }
+        return true
+    }
+    function match(selector, element) {
+        let result = parse(selector)[0]
+        // 按照复杂选择器-》复合选择器-》简单选择器的步骤处理
+        console.log(result);
+        console.dir(element);
+        let cur
+        while (result.length) {
+            cur = result.pop()
+            if (!matchElement(cur, element)) {
+                return false
+            }
+            cur = result.pop()
+            if (cur === '>') {
+                element = element.parentElement
+            } else if (cur === '+') {
+                element = element.nextElementSibling
+            }
+        }
+        return true
+    }
+    console.log(match('div>div#id.class', document.getElementById('id')))
+</script>
+</body>
+</html>
