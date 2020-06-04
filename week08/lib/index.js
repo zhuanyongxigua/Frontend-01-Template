@@ -29,16 +29,44 @@ function matchElement(attrs, element) {
 module.exports = function match(selector, element) {
     let result = parse(selector)[0]
     let cur
+    let isContinue
     while (result.length) {
-        cur = result.pop()
-        if (!matchElement(cur, element)) {
-            return false
+        if (!isContinue) {
+            cur = result.pop()
         }
-        cur = result.pop()
+        if (isContinue) {
+            if (matchElement(result[result.length - 1], element)) {
+                cur = result.pop()
+                isContinue = false
+            }
+        } else {
+            if (!matchElement(cur, element)) {
+                return false
+            }
+        }
+        if (!isContinue) {
+            cur = result.pop()
+        }
         if (cur === '>') {
             element = element.parentElement
+            isContinue = false
         } else if (cur === '+') {
-            element = element.nextElementSibling
+            element = element.previousElementSibling
+            isContinue = false
+        } else if (cur === ' ') {
+            element = element.parentElement
+            if (element !== null) {
+                isContinue = true
+            } else {
+                return false
+            }
+        } else if (cur === '~') {
+            element = element.previousElementSibling
+            if (element !== null) {
+                isContinue = true
+            } else {
+                return false
+            }
         }
     }
     return true
