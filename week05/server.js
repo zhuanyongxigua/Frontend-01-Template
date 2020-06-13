@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
     console.log(req.headers);
     res.setHeader('Content-Type', 'text/html')
     res.setHeader('X-Foo', 'bar')
-    res.setHeader(200, { 'Content-Type': 'text/plain' })
+    res.writeHeader(200, { 'Content-Type': 'text/plain' })
     res.end('ok')
 })
 
