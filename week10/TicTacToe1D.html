@@ -18,22 +18,23 @@
 </head>
 <body>
   <div id="board"></div>
-
 <script>
   let pattern = [
-    [2, 0, 0],
-    [0, 1, 0],
-    [0, 0, 0]
+    0, 0, 0,
+    0, 0, 0,
+    0, 0, 0
   ]
-  function show() {
+  let color = 1
+  function show(pattern) {
     let board = document.getElementById('board')
+    board.innerHTML = ""
     for(let i = 0; i < 3; i++) {
       // j是x轴坐标
       for(let j = 0; j < 3; j++) {
         let cell = document.createElement('div')
         cell.classList.add('cell')
-        cell.innerText = pattern[j][i] == 2 ? "❌" :
-          pattern[j][i] == 1 ? "⭕" : ""
+        cell.innerText = pattern[i * 3 + j] == 2 ? "❌" :
+          pattern[i * 3 + j] == 1 ? "⭕" : ""
         cell.addEventListener('click', () => userMove(j, i))
         board.appendChild(cell)
       }
@@ -42,11 +43,11 @@
   }
   function userMove(x, y) {
     pattern[y * 3 + x] = color
-    if(check[pattern, color]) {
+    if(check(pattern, color)) {
       alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
     }
     color = 3 - color
-    show()
+    show(pattern)
     computerMove()
   }
   function computerMove() {
@@ -58,8 +59,9 @@
       alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
     }
     color = 3 - color
-    show()
+    show(pattern)
   }
+  // 把四个部分抽象成一个，加一个x，y
   function check(pattern, color) {
     for (let i = 0; i < 3; i++) {
       let win = true
@@ -82,7 +84,7 @@
     {
       let win = true
       for (let j = 0; j < 3; j++) {
-        if (pattern[j * 3 + 2 - j] !== color) {
+        if (pattern[j * 3 + j] !== color) {
           win = false
         }
       }
@@ -91,7 +93,7 @@
     {
       let win = true
       for (let i = 0; i < 3; i++) {
-        if (pattern[j * 3 + j] !== color) {
+        if (pattern[i * 3 + 2 - i] !== color) {
           win = false
         }
       }
@@ -99,7 +101,7 @@
     }
     return false
   }
-  show(pattern)
+  // 节约内存，提高性能
   function clone(pattern) {
     return Object.create(pattern)
   }
@@ -118,12 +120,6 @@
     }
     return null
   }
-  let openings = new Map()
-  openings.set([
-    [0, 0, 0],
-    [0, 0, 0],
-    [0, 0, 0]
-  ])
   function bestChoice(pattern, color) {
     let point = willWin(pattern, color)
     if(point) {
@@ -132,6 +128,7 @@
         result: 1
       }
     }
+    let result = -1
     outer:for(let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) { 
         if (pattern[i * 3 + j] !== 0) {

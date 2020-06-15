@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+  .cell {
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    display: inline-block;
+    border: solid 1px white;
+    vertical-align: middle;
+    line-height: 100px;
+    font-size: 50px;
+    text-align: center;
+  }
+
+</style>
+</head>
+<body>
+  <div id="board"></div>
+<script>
+  let pattern = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]
+  let color = 1
+  function show(pattern) {
+    let board = document.getElementById('board')
+    board.innerHTML = ""
+    for(let i = 0; i < 3; i++) {
+      // j是x轴坐标
+      for(let j = 0; j < 3; j++) {
+        let cell = document.createElement('div')
+        cell.classList.add('cell')
+        cell.innerText = pattern[i][j] == 2 ? "❌" :
+          pattern[i][j] == 1 ? "⭕" : ""
+        cell.addEventListener('click', () => userMove(j, i))
+        board.appendChild(cell)
+      }
+      board.appendChild(document.createElement('br'))
+    }
+  }
+  function userMove(x, y) {
+    pattern[y][x] = color
+    if(check(pattern, color)) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+    computerMove()
+  }
+  function computerMove() {
+    let choice = bestChoice(pattern, color)
+    if (choice.point) {
+      pattern[choice.point[1]][choice.point[0]] = color
+    }
+    if (check(pattern, color)) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+  }
+  // 把四个部分抽象成一个，加一个x，y
+  function check(pattern, color) {
+    for (let i = 0; i < 3; i++) {
+      let win = true
+      for(let j = 0; j < 3; j++) {
+        if (pattern[i][j] !== color) {
+          win = false
+        }
+      }
+      if(win) return true
+    }
+    for (let i = 0; i < 3; i++) {
+      let win = true
+      for (let j = 0; j < 3; j++) {
+        if (pattern[j][i] !== color) {
+          win = false
+        }
+      }
+      if(win) return true
+    }
+    {
+      let win = true
+      for (let j = 0; j < 3; j++) {
+        if (pattern[j][j] !== color) {
+          win = false
+        }
+      }
+      if (win) return true
+    }
+    {
+      let win = true
+      for (let i = 0; i < 3; i++) {
+        if (pattern[i][2 - i] !== color) {
+          win = false
+        }
+      }
+      if(win) return true
+    }
+    return false
+  }
+  function clone(pattern) {
+    // return Object.create(pattern)
+    return JSON.parse(JSON.stringify(pattern))
+  }
+  function willWin(pattern, color) {
+    for(let i = 0; i < 3; i++) {
+      for(let j = 0; j < 3; j++) {
+        if(pattern[i][j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i][j] = color
+        if(check(tmp, color)) {
+          return [j, i]
+        }
+      }
+    }
+    return null
+  }
+  // 棋谱
+  // 后面那个字符串1是color
+  let openings = new Map()
+  openings.set([
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ].toString() + "1", {
+    point: [1, 1],
+    result: 0
+  })
+  // 中间遍历产生的那些赢的结果哪去了？
+  // 因为中间那个产生递归的bestChoice是对手必赢的结果
+  // 发现对手必赢了之后，当前就要避免这个结果
+  // 所以那些赢的结果都被避免掉了
+  function bestChoice(pattern, color) {
+    if (openings.has(pattern.toString() + color)) {
+      return openings.get(pattern.toString() + color)
+    }
+    let point = willWin(pattern, color)
+    if(point) {
+      return {
+        point: point,
+        result: 1
+      }
+    }
+    let result = -1
+    outer:for(let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) { 
+        if (pattern[i][j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i][j] = color
+        let opp = bestChoice(tmp, 3 - color)
+        if(-opp.result >= result) {
+          point = [j, i]
+          result = - opp.result
+        }
+        if (result == 1) {
+          break outer
+        }
+      }
+    }
+    return {
+      point: point,
+      result: point ? result : 0
+    }
+  }
+  show(pattern)
+</script>
+</body>
+</html>
