@@ -8,7 +8,7 @@ var browserSync = require("browser-sync").create();
 browserSync.init({
     files: ['./*.html'],
     server: true,
-    startPath: "./TicTacToe.html",
+    startPath: "./GoBang.html",
     localOnly: false,
     // host: "192.168.199.120",
     port: 8081,
