@@ -50,7 +50,7 @@
   }
   function userMove(x, y) {
     pattern[y * times + x] = color
-    if(check(pattern, color)) {
+    if(check(pattern, color, x, y)) {
       alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
     }
     color = 3 - color
@@ -68,46 +68,83 @@
     color = 3 - color
     show(pattern)
   }
-  // 把四个部分抽象成一个，加一个x，y
-  function check(pattern, color) {
-    for (let i = 0; i < times; i++) {
-      let win = true
-      for(let j = 0; j < times; j++) {
-        if (pattern[i * times + j] !== color) {
-          win = false
-        }
+  function check(pattern, color, x, y) {
+    let continueNum = 0
+    for(let i = 0; i < times; i++) {
+      if (continueNum === 5) {
+        return true
       }
-      if(win) return true
-    }
-    for (let i = 0; i < times; i++) {
-      let win = true
-      for (let j = 0; j < times; j++) {
-        if (pattern[j * times + i] !== color) {
-          win = false
-        }
+      if (pattern[x + i * times] === color) {
+        continueNum++
+      } else {
+        continueNum = 0
       }
-      if(win) return true
     }
-    {
-      let win = true
-      for (let j = 0; j < times; j++) {
-        if (pattern[j * times + j] !== color) {
-          win = false
-        }
+    if (continueNum === 5) {
+      return true
+    }
+    for(let i = 0; i < times; i++) {
+      if (continueNum === 5) {
+        return true
       }
-      if (win) return true
-    }
-    {
-      let win = true
-      for (let i = 0; i < times; i++) {
-        if (pattern[i * times + 2 - i] !== color) {
-          win = false
-        }
+      if (pattern[y * times + i] === color) {
+        continueNum++
+      } else {
+        continueNum = 0
       }
-      if(win) return true
     }
+    if (continueNum === 5) {
+      return true
+    }
+
+
+    // 斜率为1的直线
+    let start = 0
+    if (x > y) {
+      start = x - y
+    } else {
+      start = (y - x) * times
+    }
+    for(let i = 0; i < times - Math.abs(x - y); i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times + 1 * times] === color) {
+        continueNum++
+      } else {
+        continueNum = 0
+      }
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+    // 斜率为-1的直线
+    // 是一个y = -x + b的方程
+    start = 0
+    if (x + y < times - 1) {
+      // 就是把y轴的b放到x轴，因为这个直线是相对过原点的斜率为1的直线对称的
+      start = x + y
+    } else {
+      start = (x + y - times + 1) * times + times - 1
+    }
+    for(let i = 0; i < times - Math.abs(x - y); i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times - 1 * times] === color) {
+        continueNum++
+      } else {
+        continueNum = 0
+      }
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
     return false
   }
+  // 把四个部分抽象成一个，加一个x，y
   // 节约内存，提高性能
   function clone(pattern) {
     return Object.create(pattern)
