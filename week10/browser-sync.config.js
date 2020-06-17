@@ -10,7 +10,7 @@ browserSync.init({
     server: true,
     startPath: "./GoBang.html",
     localOnly: false,
-    // host: "192.168.199.120",
+    host: "192.168.199.166",
     port: 8081,
     notify: false,
 });

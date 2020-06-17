@@ -54,6 +54,10 @@
       return
     }
     pattern[y * times + x] = color
+    let isWillWin = willWin(pattern, color)
+    if (isWillWin) {
+      console.log(isWillWin);
+    }
     if(check(pattern, color, x, y)) {
       alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
     }
@@ -75,7 +79,7 @@
       } else {
         if (continueNum >= 4) {
           // isWillWin = true
-          console.log(willWin(pattern, color));
+          // console.log(willWin(pattern, color));
         }
         if (continueNum === 5) {
           return true
@@ -85,7 +89,7 @@
     }
     if (continueNum >= 4) {
       // isWillWin = true
-      console.log(willWin(pattern, color));
+      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -103,7 +107,7 @@
       } else {
         if (continueNum >= 4) {
           // isWillWin = true
-          console.log(willWin(pattern, color));
+          // console.log(willWin(pattern, color));
         }
         if (continueNum === 5) {
           return true
@@ -113,7 +117,7 @@
     }
     if (continueNum >= 4) {
       // isWillWin = true
-      console.log(willWin(pattern, color));
+      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -136,7 +140,7 @@
       } else {
         if (continueNum >= 4) {
           // isWillWin = true
-          console.log(willWin(pattern, color));
+          // console.log(willWin(pattern, color));
         }
         if (continueNum === 5) {
           return true
@@ -146,7 +150,7 @@
     }
     if (continueNum >= 4) {
       // isWillWin = true
-      console.log(willWin(pattern, color));
+      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -176,7 +180,7 @@
       } else {
         if (continueNum >= 4) {
           // isWillWin = true
-          console.log(willWin(pattern, color));
+          // console.log(willWin(pattern, color));
         }
         if (continueNum === 5) {
           return true
@@ -190,7 +194,7 @@
     // 当下棋起始点不在(0, 4)的时候，上面的循环会进入else，continueNum会被清零
     // 下面的判断进不去
     if (continueNum >= 4) {
-      console.log(willWin(pattern, color));
+      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
