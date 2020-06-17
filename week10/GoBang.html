@@ -20,13 +20,13 @@
   <div id="board"></div>
   <label for="">
     行列数
-    <input type="number" id="times" value="5">
+    <input type="number" id="times" value="10">
   </label>
 <script>
   let times = 10
   let timesInput = document.getElementById('times')
   let pattern = Array.from({length: times * times}).map(ele => 0)
-  let isWillWin = false
+  // let isWillWin = false
   timesInput.addEventListener('change', function(event) {
     times = Number(event.target.value)
     pattern = Array.from({length: times * times}).map(ele => 0)
@@ -77,19 +77,11 @@
       if (pattern[x + i * times] === color) {
         continueNum++
       } else {
-        if (continueNum >= 4) {
-          // isWillWin = true
-          // console.log(willWin(pattern, color));
-        }
         if (continueNum === 5) {
           return true
         }
         continueNum = 0
       }
-    }
-    if (continueNum >= 4) {
-      // isWillWin = true
-      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -105,19 +97,11 @@
       if (pattern[y * times + i] === color) {
         continueNum++
       } else {
-        if (continueNum >= 4) {
-          // isWillWin = true
-          // console.log(willWin(pattern, color));
-        }
         if (continueNum === 5) {
           return true
         }
         continueNum = 0
       }
-    }
-    if (continueNum >= 4) {
-      // isWillWin = true
-      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -138,19 +122,11 @@
       if (pattern[start + i * times + 1 * i] === color) {
         continueNum++
       } else {
-        if (continueNum >= 4) {
-          // isWillWin = true
-          // console.log(willWin(pattern, color));
-        }
         if (continueNum === 5) {
           return true
         }
         continueNum = 0
       }
-    }
-    if (continueNum >= 4) {
-      // isWillWin = true
-      // console.log(willWin(pattern, color));
     }
     if (continueNum === 5) {
       return true
@@ -178,10 +154,6 @@
       if (pattern[start + i * times - 1 * i] === color) {
         continueNum++
       } else {
-        if (continueNum >= 4) {
-          // isWillWin = true
-          // console.log(willWin(pattern, color));
-        }
         if (continueNum === 5) {
           return true
         }
@@ -193,9 +165,6 @@
     // 当下棋的方向是第一个方向，且起始点是(0, 4)的时候，循环里面的那个判断进不去
     // 当下棋起始点不在(0, 4)的时候，上面的循环会进入else，continueNum会被清零
     // 下面的判断进不去
-    if (continueNum >= 4) {
-      // console.log(willWin(pattern, color));
-    }
     if (continueNum === 5) {
       return true
     }
