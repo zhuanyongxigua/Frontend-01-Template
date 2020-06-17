@@ -44,7 +44,7 @@
 // 定义一个Number
 <Number> = "0" | "1" | "2" | .... | "9"
 // 十进制数
-<DecimalNumber> = "0" | {{ "1" | "2" | "3" | ... | "9"} <Number>* }
+<DecimalNumber> = "0" | {{ "1" | "2" | "3" | ... | "9"}} <Number>*
 // 括号的表达式
 <PrimaryExpression> = <PrimaryExpression> |
   "(" <LogicExpression> ")"
