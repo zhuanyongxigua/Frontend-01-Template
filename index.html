@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+  .cell {
+    width: 50px;
+    height: 50px;
+    background-color: green;
+    display: inline-block;
+    border: solid 1px white;
+    vertical-align: middle;
+    line-height: 50px;
+    font-size: 25px;
+    text-align: center;
+  }
+
+</style>
+</head>
+<body>
+  <div id="board"></div>
+  <label for="">
+    行列数
+    <input type="number" id="times" value="10">
+  </label>
+<script>
+  let times = 10
+  let timesInput = document.getElementById('times')
+  let pattern = Array.from({length: times * times}).map(ele => 0)
+  // let isWillWin = false
+  timesInput.addEventListener('change', function(event) {
+    times = Number(event.target.value)
+    pattern = Array.from({length: times * times}).map(ele => 0)
+    show(pattern)
+  })
+  let color = 1
+  function show(pattern) {
+    let board = document.getElementById('board')
+    board.innerHTML = ""
+    for(let i = 0; i < times; i++) {
+      // j是x轴坐标
+      for(let j = 0; j < times; j++) {
+        let cell = document.createElement('div')
+        cell.classList.add('cell')
+        cell.innerText = pattern[i * times + j] == 2 ? "❌" :
+          pattern[i * times + j] == 1 ? "⭕" : ""
+        cell.addEventListener('click', () => userMove(j, i))
+        board.appendChild(cell)
+      }
+      board.appendChild(document.createElement('br'))
+    }
+  }
+  function userMove(x, y) {
+    if (pattern[y * times + x] !== 0) {
+      return
+    }
+    pattern[y * times + x] = color
+    let isWillWin = willWin(pattern, color)
+    if (isWillWin) {
+      console.log(isWillWin);
+    }
+    if(check(pattern, color, x, y)) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+    // if (isWillWin) {
+    //   computerMove()
+    // }
+  }
+  function check(pattern, color, x, y) {
+    // 纵向
+    let continueNum = 0
+    for(let i = 0; i < times; i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[x + i * times] === color) {
+        continueNum++
+      } else {
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+
+    // 横向
+    continueNum = 0
+    for(let i = 0; i < times; i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[y * times + i] === color) {
+        continueNum++
+      } else {
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+    // 斜率为1的直线
+    continueNum = 0
+    let start = 0
+    if (x > y) {
+      start = x - y
+    } else {
+      start = (y - x) * times
+    }
+    for(let i = 0; i < times - Math.abs(x - y); i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times + 1 * i] === color) {
+        continueNum++
+      } else {
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+    // 斜率为-1的直线
+    // 是一个y = -x + b的方程
+    continueNum = 0
+    start = 0
+    let length
+    if (x + y < times - 1) {
+      // 就是把y轴的b放到x轴，因为这个直线是相对过原点的斜率为1的直线对称的
+      start = x + y
+      length = start + 1
+    } else {
+      // x + y就是方程y = -x + b里面的那个b
+      // x + y - times + 1就是方程中x为times - 1时候的y的值
+      start = (x + y - times + 1) * times + times - 1
+      length = times - 1 - (x + y - times + 1) + 1
+    }
+    for(let i = 0; i < length; i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times - 1 * i] === color) {
+        continueNum++
+      } else {
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    // 由于有两个方向，比如从点(0, 4)到点(4, 0)
+    // 和从点(4, 0)到点(0, 4)
+    // 当下棋的方向是第一个方向，且起始点是(0, 4)的时候，循环里面的那个判断进不去
+    // 当下棋起始点不在(0, 4)的时候，上面的循环会进入else，continueNum会被清零
+    // 下面的判断进不去
+    if (continueNum === 5) {
+      return true
+    }
+
+    return false
+  }
+  // 节约内存，提高性能
+  function clone(pattern) {
+    return Object.create(pattern)
+  }
+  function willWin(pattern, color) {
+    for(let i = 0; i < times; i++) {
+      for(let j = 0; j < times; j++) {
+        if(pattern[i * times + j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i * times + j] = color
+        if(check(tmp, color, j, i)) {
+          return [j, i]
+        }
+      }
+    }
+    return null
+  }
+
+  show(pattern)
+
+
+
+
+
+
+  function computerMove() {
+    let choice = bestChoice(pattern, color)
+    if (choice.point) {
+      pattern[choice.point[1] * times + choice.point[0]] = color
+    }
+    if (check(pattern, color, choice.point[0], choice.point[1])) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+  }
+  function bestChoice(pattern, color) {
+    let point = willWin(pattern, color)
+    if(point) {
+      return {
+        point: point,
+        result: 1
+      }
+    }
+    let result = -1
+    outer:for(let i = 0; i < times; i++) {
+      for (let j = 0; j < times; j++) { 
+        if (pattern[i * times + j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i * times + j] = color
+        let opp = bestChoice(tmp, 3 - color)
+        if(-opp.result >= result) {
+          point = [j, i]
+          result = - opp.result
+        }
+        if (result == 1) {
+          break outer
+        }
+      }
+    }
+    return {
+      point: point,
+      result: point ? result : 0
+    }
+  }
+</script>
+</body>
+</html>
