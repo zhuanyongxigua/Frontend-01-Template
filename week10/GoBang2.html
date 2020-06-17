@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style>
+  .cell {
+    width: 50px;
+    height: 50px;
+    background-color: green;
+    display: inline-block;
+    border: solid 1px white;
+    vertical-align: middle;
+    line-height: 50px;
+    font-size: 25px;
+    text-align: center;
+  }
+
+</style>
+</head>
+<body>
+  <div id="board"></div>
+  <label for="">
+    行列数
+    <input type="number" id="times" value="5">
+  </label>
+<script>
+  let times = 5
+  let timesInput = document.getElementById('times')
+  let pattern = Array.from({length: times * times}).map(ele => 0)
+  timesInput.addEventListener('change', function(event) {
+    times = Number(event.target.value)
+    pattern = Array.from({length: times * times}).map(ele => 0)
+    show(pattern)
+  })
+  let color = 1
+  function show(pattern) {
+    let board = document.getElementById('board')
+    board.innerHTML = ""
+    for(let i = 0; i < times; i++) {
+      // j是x轴坐标
+      for(let j = 0; j < times; j++) {
+        let cell = document.createElement('div')
+        cell.classList.add('cell')
+        cell.innerText = pattern[i * times + j] == 2 ? "❌" :
+          pattern[i * times + j] == 1 ? "⭕" : ""
+        cell.addEventListener('click', () => userMove(j, i))
+        board.appendChild(cell)
+      }
+      board.appendChild(document.createElement('br'))
+    }
+  }
+  function userMove(x, y) {
+    pattern[y * times + x] = color
+    if(check(pattern, color, x, y, times)) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+    // computerMove()
+  }
+  function computerMove() {
+    let choice = bestChoice(pattern, color)
+    if (choice.point) {
+      pattern[choice.point[1] * times + choice.point[0]] = color
+    }
+    if (check(pattern, color)) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
+  }
+  function check(pattern, color, x, y, times) {
+    let continueNum = 0
+    let start = 0
+    let starts = [
+      (x, y, times) => x,
+      (x, y, times) => y,
+      (x, y, times) => {
+        if (x > y) {
+          return x - y
+        } else {
+          return (y - x) * times
+        }
+      },
+      (x, y, times) => {
+        if (x + y < times - 1) {
+          // 就是把y轴的b放到x轴，因为这个直线是相对过原点的斜率为1的直线对称的
+          return x + y
+        } else {
+          return (x + y - times + 1) * times + times - 1
+        }
+      }
+    ]
+    let lengths = [
+      (x, y, times) => times,
+      (x, y, times) => times,
+      (x, y, times) => times - Math.abs(x - y),
+      (x, y, times) => times - Math.abs(x - y)
+    ]
+    let indexes = [
+      (start, i, times) => start + i * times,
+      (start, i, times) => start * times + i,
+      (start, i, times) => start + i * times + 1 * times,
+      (start, i, times) => start + i * times - 1 * times
+    ]
+    for (let i = 0; i < 4; i++) {
+      start = starts[i]()
+      for(let i = 0; i < lengths[i](); i++) {
+        if (continueNum === 5) {
+          return true
+        }
+        if (pattern[indexes[i]()] === color) {
+          continueNum++
+        } else {
+          continueNum = 0
+        }
+      }
+      if (continueNum === 5) {
+        return true
+      }
+    }
+    return false
+  }
+  // 节约内存，提高性能
+  function clone(pattern) {
+    return Object.create(pattern)
+  }
+  function willWin(pattern, color) {
+    for(let i = 0; i < times; i++) {
+      for(let j = 0; j < times; j++) {
+        if(pattern[i * times + j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i * times + j] = color
+        if(check(tmp, color)) {
+          return [j, i]
+        }
+      }
+    }
+    return null
+  }
+  function bestChoice(pattern, color) {
+    let point = willWin(pattern, color)
+    if(point) {
+      return {
+        point: point,
+        result: 1
+      }
+    }
+    let result = -1
+    outer:for(let i = 0; i < times; i++) {
+      for (let j = 0; j < times; j++) { 
+        if (pattern[i * times + j] !== 0) {
+          continue
+        }
+        let tmp = clone(pattern)
+        tmp[i * times + j] = color
+        let opp = bestChoice(tmp, 3 - color)
+        if(-opp.result >= result) {
+          point = [j, i]
+          result = - opp.result
+        }
+        if (result == 1) {
+          break outer
+        }
+      }
+    }
+    return {
+      point: point,
+      result: point ? result : 0
+    }
+  }
+  show(pattern)
+</script>
+</body>
+</html>

@@ -23,9 +23,10 @@
     <input type="number" id="times" value="5">
   </label>
 <script>
-  let times = 5
+  let times = 10
   let timesInput = document.getElementById('times')
   let pattern = Array.from({length: times * times}).map(ele => 0)
+  let isWillWin = false
   timesInput.addEventListener('change', function(event) {
     times = Number(event.target.value)
     pattern = Array.from({length: times * times}).map(ele => 0)
@@ -49,75 +50,152 @@
     }
   }
   function userMove(x, y) {
+    if (pattern[y * times + x] !== 0) {
+      return
+    }
     pattern[y * times + x] = color
-    if(check(pattern, color, x, y, times)) {
+    if(check(pattern, color, x, y)) {
       alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
     }
     color = 3 - color
     show(pattern)
-    // computerMove()
+    // if (isWillWin) {
+    //   computerMove()
+    // }
   }
-  function computerMove() {
-    let choice = bestChoice(pattern, color)
-    if (choice.point) {
-      pattern[choice.point[1] * times + choice.point[0]] = color
-    }
-    if (check(pattern, color)) {
-      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
-    }
-    color = 3 - color
-    show(pattern)
-  }
-  function check(pattern, color, x, y, times) {
+  function check(pattern, color, x, y) {
+    // 纵向
     let continueNum = 0
-    let start = 0
-    let starts = [
-      (x, y, times) => x,
-      (x, y, times) => y,
-      (x, y, times) => {
-        if (x > y) {
-          return x - y
-        } else {
-          return (y - x) * times
-        }
-      },
-      (x, y, times) => {
-        if (x + y < times - 1) {
-          // 就是把y轴的b放到x轴，因为这个直线是相对过原点的斜率为1的直线对称的
-          return x + y
-        } else {
-          return (x + y - times + 1) * times + times - 1
-        }
-      }
-    ]
-    let lengths = [
-      (x, y, times) => times,
-      (x, y, times) => times,
-      (x, y, times) => times - Math.abs(x - y),
-      (x, y, times) => times - Math.abs(x - y)
-    ]
-    let indexes = [
-      (start, i, times) => start + i * times,
-      (start, i, times) => start * times + i,
-      (start, i, times) => start + i * times + 1 * times,
-      (start, i, times) => start + i * times - 1 * times
-    ]
-    for (let i = 0; i < 4; i++) {
-      start = starts[i]()
-      for(let i = 0; i < lengths[i](); i++) {
-        if (continueNum === 5) {
-          return true
-        }
-        if (pattern[indexes[i]()] === color) {
-          continueNum++
-        } else {
-          continueNum = 0
-        }
-      }
+    for(let i = 0; i < times; i++) {
       if (continueNum === 5) {
         return true
       }
+      if (pattern[x + i * times] === color) {
+        continueNum++
+      } else {
+        if (continueNum >= 4) {
+          // isWillWin = true
+          console.log(willWin(pattern, color));
+        }
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
     }
+    if (continueNum >= 4) {
+      // isWillWin = true
+      console.log(willWin(pattern, color));
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+
+    // 横向
+    continueNum = 0
+    for(let i = 0; i < times; i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[y * times + i] === color) {
+        continueNum++
+      } else {
+        if (continueNum >= 4) {
+          // isWillWin = true
+          console.log(willWin(pattern, color));
+        }
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    if (continueNum >= 4) {
+      // isWillWin = true
+      console.log(willWin(pattern, color));
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+    // 斜率为1的直线
+    continueNum = 0
+    let start = 0
+    if (x > y) {
+      start = x - y
+    } else {
+      start = (y - x) * times
+    }
+    for(let i = 0; i < times - Math.abs(x - y); i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times + 1 * i] === color) {
+        continueNum++
+      } else {
+        if (continueNum >= 4) {
+          // isWillWin = true
+          console.log(willWin(pattern, color));
+        }
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    if (continueNum >= 4) {
+      // isWillWin = true
+      console.log(willWin(pattern, color));
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
+    // 斜率为-1的直线
+    // 是一个y = -x + b的方程
+    continueNum = 0
+    start = 0
+    let length
+    if (x + y < times - 1) {
+      // 就是把y轴的b放到x轴，因为这个直线是相对过原点的斜率为1的直线对称的
+      start = x + y
+      length = start + 1
+    } else {
+      // x + y就是方程y = -x + b里面的那个b
+      // x + y - times + 1就是方程中x为times - 1时候的y的值
+      start = (x + y - times + 1) * times + times - 1
+      length = times - 1 - (x + y - times + 1) + 1
+    }
+    for(let i = 0; i < length; i++) {
+      if (continueNum === 5) {
+        return true
+      }
+      if (pattern[start + i * times - 1 * i] === color) {
+        continueNum++
+      } else {
+        if (continueNum >= 4) {
+          // isWillWin = true
+          console.log(willWin(pattern, color));
+        }
+        if (continueNum === 5) {
+          return true
+        }
+        continueNum = 0
+      }
+    }
+    // 由于有两个方向，比如从点(0, 4)到点(4, 0)
+    // 和从点(4, 0)到点(0, 4)
+    // 当下棋的方向是第一个方向，且起始点是(0, 4)的时候，循环里面的那个判断进不去
+    // 当下棋起始点不在(0, 4)的时候，上面的循环会进入else，continueNum会被清零
+    // 下面的判断进不去
+    if (continueNum >= 4) {
+      console.log(willWin(pattern, color));
+    }
+    if (continueNum === 5) {
+      return true
+    }
+
     return false
   }
   // 节约内存，提高性能
@@ -132,12 +210,31 @@
         }
         let tmp = clone(pattern)
         tmp[i * times + j] = color
-        if(check(tmp, color)) {
+        if(check(tmp, color, j, i)) {
           return [j, i]
         }
       }
     }
     return null
+  }
+
+  show(pattern)
+
+
+
+
+
+
+  function computerMove() {
+    let choice = bestChoice(pattern, color)
+    if (choice.point) {
+      pattern[choice.point[1] * times + choice.point[0]] = color
+    }
+    if (check(pattern, color, choice.point[0], choice.point[1])) {
+      alert(color == 2 ? "❌ is winner!" : "⭕ is winner!")
+    }
+    color = 3 - color
+    show(pattern)
   }
   function bestChoice(pattern, color) {
     let point = willWin(pattern, color)
@@ -170,7 +267,6 @@
       result: point ? result : 0
     }
   }
-  show(pattern)
 </script>
 </body>
 </html>
