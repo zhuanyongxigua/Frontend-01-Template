@@ -8,7 +8,7 @@ var browserSync = require("browser-sync").create();
 browserSync.init({
     files: ['./*.html'],
     server: true,
-    startPath: "./GoBang.html",
+    startPath: "./week11/editor.html",
     localOnly: false,
     host: "192.168.199.166",
     port: 8081,
