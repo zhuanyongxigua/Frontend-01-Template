@@ -26,9 +26,12 @@ class TrunkedBodyParser {
         this.current = this.WAITING_LENGTH_LINE_END
       } else {
         // 这个地方没动，老说说的是在十进制的末尾加一位
-        this.length *= 10
+        // this.length *= 10
+        // length应该是16进制
+        this.length *= 16
         // 这里用Number(char)也是可以的
-        this.length += char.charCodeAt(0) - '0'.charCodeAt(0)
+        // this.length += char.charCodeAt(0) - '0'.charCodeAt(0)
+        this.length += parseInt(char, 16)
       }
     } else if (this.current === this.WAITING_LENGTH_LINE_END) {
       if (char === '\n') {
