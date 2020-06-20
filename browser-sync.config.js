@@ -6,11 +6,11 @@
 var browserSync = require("browser-sync").create();
 
 browserSync.init({
-    files: ['./*.html'],
+    files: ['./**/*.html'],
     server: true,
-    startPath: "./week11/editor.html",
+    startPath: "./week11/trafficLight.html",
     localOnly: false,
-    host: "192.168.199.166",
+    // host: "192.168.199.166",
     port: 8081,
     notify: false,
 });
