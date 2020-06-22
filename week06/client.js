@@ -1,4 +1,5 @@
 const net = require('net')
+const parse = require('./parse')
 
 class TrunkedBodyParser {
   constructor() {
@@ -215,8 +216,9 @@ void async function() {
     }
   })
 
+  // 正常这里应该做成generator的形式的，但是太麻烦，就简化了
   let response = await request.send()
-  console.log(response);
+  let dom = parser.parseHTML(response.body)
 }()
 
 class Response {
