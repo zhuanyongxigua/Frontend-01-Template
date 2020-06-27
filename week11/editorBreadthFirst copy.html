@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .cell {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: gray;
+            border-bottom: solid 1px white;
+            border-right: solid 1px white;
+            vertical-align: middle;
+        }
+        #container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 701px;
+        }
+    </style>
+</head>
+<body>
+<div id="container"></div>
+<button onclick="localStorage.map = JSON.stringify(map)">save</button>
+<script>
+// 这个数据结构用于启发是搜索
+class Sorted {
+    constructor(data, compare) {
+        this.data = data;
+        this.compare = compare;
+    }
+    take() {
+        if(!this.data.length) {
+            return;
+        }
+        let min = this.data[0];
+        let minIndex = 0;
+        for (let i = 1; i < this.data.length; i++) {
+            if (this.compare(this.data[i], min) < 0) {
+                min = this.data[i];
+                minIndex = i;
+            }
+        }
+        this.data[minIndex] = this.data[this.data.length - 1];
+        this.data.pop()
+        return min;
+    }
+    insert(v) {
+        this.data.push(v)
+    }
+    get length() {
+        return this.data.length
+    }
+}
+let map = localStorage["map"] ? JSON.parse(localStorage['map']) : Array(10000).fill(0);
+let container = document.getElementById("container");
+for (let y = 0; y < 100; y++) {
+    for(let x = 0; x < 100; x++) {
+        let cell = document.createElement('div');
+        cell.classList.add('cell');
+        if (map[100 * y + x] == 1) {
+            cell.style.backgroundColor = 'black';
+        }
+        cell.addEventListener('mouseover', () => {
+            if (mouse) {
+                if (clear) {
+                    cell.style.backgroundColor = '';
+                    map[y * 100 + x] = 0;
+                } else {
+                    cell.style.backgroundColor = 'black';
+                    map[y * 100 + x] = 1;
+                }
+            }
+        })
+        container.appendChild(cell);
+    }
+}
+let mouse = false;
+let clear = false;
+document.addEventListener('mousedown', e => {
+    mouse = true;
+    clear = (e.which === 3);
+})
+document.addEventListener('mouseup', () => mouse = false);
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+function sleep(t) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, t);
+    })
+}
+
+async function path(map, start, end) {
+    map = map.slice();
+    // 因为距离起点的距离不知道，所以先弄一个正无穷
+    let table = new Array(10000).fill(Infinity)
+    table[start[1] * 100 + start[0]] = 0;
+    function distance([x, y]) {
+        return (x - end[0]) ** 2 + (y - end[1]) ** 2;
+    }
+    let collection = new Sorted([start], (a, b) => distance(a) - distance(b));
+    async function insert([x, y], pre, fromStart) {
+        if (map[100 * y + x] === 1) {
+            return;
+        }
+        // 超过边界的不要
+        if (x < 0 || y < 0 || x >= 100 || y >= 100) {
+            return;
+        }
+        if (fromStart >= table[100 * y + x]) {
+            return;
+        }
+        map[100 * y + x] = pre;
+        table[100 * y + x] = fromStart;
+        container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
+        await sleep(1);
+        collection.insert([x, y]);
+    }
+    while (collection.length) {
+        let [x, y] = collection.take();
+        let fromStart = table[100 * y + x];
+        if(x === end[0] && y === end[1]) {
+            let path = [];
+            while (x !== start[0] || y !== start[1]) {
+                path.push([x, y]);
+                container.children[y * 100 + x].style.backgroundColor = 'pink';
+                [x, y] = map[y * 100 + x];
+            }
+            return path
+        }
+        await insert([x - 1, y], [x, y], fromStart + 1);
+        await insert([x + 1, y], [x, y], fromStart + 1);
+        await insert([x, y - 1], [x, y], fromStart + 1);
+        await insert([x, y + 1], [x, y], fromStart + 1);
+
+        // 斜线
+        // 这里更好的化可以加逻辑，现在的是可以穿墙的, optional的作业
+        await insert([x - 1, y - 1], [x, y], fromStart + 1.4);
+        await insert([x + 1, y - 1], [x, y], fromStart + 1.4);
+        await insert([x - 1, y + 1], [x, y], fromStart + 1.4);
+        await insert([x + 1, y + 1], [x, y], fromStart + 1.4);
+    }
+    return null
+}
+</script>
+</body>
+</html>

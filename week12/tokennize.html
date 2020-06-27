@@ -1,0 +1,29 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+<script>
+var regexp = /(function|new|return)|([ \t\n\r]+)|([a-zA-Z][a-zA-Z0-9]*)|([\(\)\{\}\,\;])/g
+var dictionary = ["keywords", "whitespace", "indentifier", "punctuator"];
+
+// 把tokenize换成状态机，保持这个api不变
+function tokenize() {
+  var token = null;
+  var lastIndex = 0;
+  do {
+    lastIndex = regexp.lastIndex;
+    token = regexp.exec(source);
+    if(!token) break;
+    for(var i = 1; i < 5; i++) {
+      if(token[i]) {
+      }
+    }
+  } while(token);
+}
+</script>
+</html>
