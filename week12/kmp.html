@@ -25,7 +25,7 @@ function find(source, pattern) {
 function find2(source, pattern) {
   let table = new Array(pattern.length).fill(0);
   let k = 0;
-  for (let j = 0; j < pattern.length; j++) {
+  for (let j = 1; j < pattern.length; j++) {
     if (pattern[j] === pattern[k]) {
       k++;
     } else {
@@ -57,7 +57,9 @@ function find2(source, pattern) {
   }
   return false;
 }
-console.log(find2('abcabcabe', 'abcabe'));
+// console.log(find2('abcabcabe', 'abcabe'));
+// console.log(find2('abcabcade', 'abcade'));
+console.log(find2('abcabcabcade', 'abcabcade'));
 </script>
 </body>
 </html>
