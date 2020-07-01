@@ -1,3 +1,42 @@
+# 重学前端week12LL算法构建AST
+
+### 四则运算
+
+* TokenNumber:
+
+  1 2 3 4 5 6 7 8 9 0 的组合
+
+* Operator：+ - * /
+
+* Whitespace: \<sp>
+
+* LineTerminator: \<LF> \<CR>
+
+> 正则如何对无效字符报错？
+
+为什么字典数组里面的可以一一对应？
+
+两个lastIndex也没听懂。怎么slice。
+
+> 乘法表达式有几种开头？
+
+两种，一种是数字，一种是乘法表达式，是根据产生式看出来的。在视频的51分钟。
+
+![](http://www.zhuanyongxigua.cn/2020-07-01-140353.jpg)
+
+老师跟推崇generator和iterator的组合。
+
+> 加法表达式有几种开头？
+
+三种。
+
+![](http://www.zhuanyongxigua.cn/2020-07-01-142924.jpg)
+
+![](http://www.zhuanyongxigua.cn/2020-07-01-142959.jpg)
+
+![](http://www.zhuanyongxigua.cn/2020-07-01-144054.jpg)
+
+
 # 重学前端week12第二节编程与算法训练｜字符串算法
 
 上来先讲了一个同学的作业，是做产生式匹配的。
