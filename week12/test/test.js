@@ -1,5 +1,5 @@
 const assert = require('assert')
-const find = require('../lib/kmp-wildcards-qm')
+const find = require('../lib/kmp-wildcards-qm2')
 
 describe('kmp match', function() {
   it('Find function should return true if match success', function() {
@@ -100,6 +100,12 @@ describe('kmp match multiple question mark', function() {
     assert.ok(find('abcde', 'a?c?e'));
     assert.ok(!find('bbcde', 'a?c?e'));
     assert.ok(find('abcabcade', 'a?cabca?e'));
+    assert.ok(!find('abbabcade', 'a?cabca?e'));
     assert.ok(find('abcde', 'a???e'));
+    assert.ok(find('abcabcade', 'a?c???a?e'));
+    assert.ok(find('abcabcade', 'a?c?b?a?e'));
+    assert.ok(find('abcabcade', 'a???????e'));
+    assert.ok(find('abcabcade', 'a?cabca?e'));
+    assert.ok(find('abcabcade', '??cabca??'));
   })
 })

@@ -29,7 +29,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}/lib/kmp-wildcards-qm.js"
+            "program": "${workspaceFolder}/lib/kmp-wildcards-qmWrong2.js"
         }
     ]
 }

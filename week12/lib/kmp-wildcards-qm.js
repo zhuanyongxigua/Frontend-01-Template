@@ -5,24 +5,24 @@ function find(source, pattern) {
     if (source[i] === pattern[j] || pattern[j] === '?') {
       j++;
     } else {
-      let curIndex = i
+      let curIndex = i;
       for (let t = j - 1; t >= 0; t--) {
         if (source[curIndex] === pattern[t] || pattern[t] === '?') {
-          queue.push(pattern[t])
-          curIndex--
+          queue.push(pattern[t]);
+          curIndex--;
         } else {
           if (queue.length !== 0) {
-            curIndex = i
-            queue.shift()
+            curIndex = i;
+            queue.shift();
             if (!queue.length) {
-              t++
+              t++;
             } else {
-              let length = queue.length
+              let length = queue.length;
               for (let f = 0; f < length; f++) {
-                let temp = queue.shift()
+                let temp = queue.shift();
                 if (source[curIndex] === temp || temp === '?') {
-                  t = t + queue.length + 2
-                  f = length
+                  t = t + queue.length + 2;
+                  break;
                 }
               }
             }
@@ -30,9 +30,9 @@ function find(source, pattern) {
         }
       }
       if (!queue.length) {
-        j = 0
+        j = 0;
       } else {
-        j = queue.length - 1
+        j = queue.length - 1;
       }
       if (source[i] === pattern[j] || pattern[j] === '?') {
         j++;
