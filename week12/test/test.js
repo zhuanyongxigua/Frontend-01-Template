@@ -1,5 +1,5 @@
 const assert = require('assert')
-const find = require('../lib/kmp-wildcards-qm')
+const find = require('../lib/kmp-wildcards-qm2')
 
 describe('kmp match', function() {
   it('Find function should return true if match success', function() {
