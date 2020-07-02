@@ -8,22 +8,128 @@
   
 </body>
 <script>
-var regexp = /(function|new|return)|([ \t\n\r]+)|([a-zA-Z][a-zA-Z0-9]*)|([\(\)\{\}\,\;])/g
-var dictionary = ["keywords", "whitespace", "indentifier", "punctuator"];
+// var regexp = /(function|new|return)|([ \t\n\r]+)|([a-zA-Z][a-zA-Z0-9]*)|([\(\)\{\}\,\;])/g
+var regexp = /([0-9\.]+)|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g
+var dictionary = ["Number", "Whitespace", "LineTerminator", "+", "-", "*", "/"];
 
 // 把tokenize换成状态机，保持这个api不变
-function tokenize() {
-  var token = null;
+function* tokenize(source) {
+  var result = null;
   var lastIndex = 0;
-  do {
+  while(true) {
+    // 匹配
     lastIndex = regexp.lastIndex;
-    token = regexp.exec(source);
-    if(!token) break;
-    for(var i = 1; i < 5; i++) {
-      if(token[i]) {
+    result = regexp.exec(source);
+    // 判断
+    if(!result) break;
+    // 有不认识的字符进来了
+    if (regexp.lastIndex - lastIndex > result[0].length) {
+      throw new Error("Unexpected token \"" + source.slice(lastIndex, regexp.lastIndex - lastIndex - result[0].length) + "\"!")
+    }
+    // 生成token
+    let token = {
+      type: null,
+      value: null
+    }
+    for(var i = 0; i < dictionary.length; i++) {
+      if(result[i + 1]) {
+        token.type = (dictionary[i]);
       }
     }
-  } while(token);
+    token.value = (result[0]);
+    yield token;
+  }
+  yield { type: "EOF" };
 }
+
+function Expression(source) {
+  if (source[0].type === "AdditiveExpression" && source[1].type === "EOF") {
+    let node = {
+      type: "Expression",
+      children: [source.shift(), source.shift()]
+    }
+    source.unshift(node);
+    return node;
+  }
+  AdditiveExpression(source);
+  return Expression(source);
+}
+
+function AdditiveExpression(source) {
+  if(source[0].type === "Number") {
+    MultiplicativeExpression(source);
+    return AdditiveExpression(source);
+  }
+  if(source[0].type === "MultiplicativeExpression") {
+    let node = {
+      type: "AdditiveExpression",
+      children: [source.shift()]
+    }
+    source.unshift(node);
+    return AdditiveExpression(source);
+  }
+  if (source[0].type === "AdditiveExpression" && source.length > 1 && source[1].type === "+") {
+    let node = {
+      type: "AdditiveExpression",
+      children: [source.shift(), source.shift()]
+    }
+    MultiplicativeExpression(source);
+    node.children.push(source.shift());
+    source.unshift(node);
+    return AdditiveExpression(source);
+  }
+  if (source[0].type === "AdditiveExpression" && source.length > 1 && source[1].type === "-") {
+    let node = {
+      type: "AdditiveExpression",
+      children: [source.shift(), source.shift()]
+    }
+    MultiplicativeExpression(source);
+    node.children.push(source.shift());
+    source.unshift(node);
+    return AdditiveExpression(source);
+  }
+  if (source[0].type === "AdditiveExpression") {
+    return source[0];
+  }
+}
+
+function MultiplicativeExpression(source) {
+  if(source[0].type === "Number") {
+    let node = {
+      type: "MultiplicativeExpression",
+      children: source.shift()
+    }
+    source.unshift(node);
+    return MultiplicativeExpression(source);
+  }
+  if (source[0].type === "MultiplicativeExpression" && source.length > 1 && source[1].type === "*") {
+    let node = {
+      type: "MultiplicativeExpression",
+      children: [source.shift(), source.shift(), source.shift()]
+    }
+    source.unshift(node);
+    return MultiplicativeExpression(source);
+  }
+  if (source[0].type === "MultiplicativeExpression" && source.length > 1 && source[1].type === "/") {
+    let node = {
+      type: "MultiplicativeExpression",
+      children: [source.shift(), source.shift(), source.shift()]
+    }
+    source.unshift(node);
+    return MultiplicativeExpression(source);
+  }
+  if (source[0].type === "MultiplicativeExpression") {
+    return source[0];
+  }
+}
+
+let source = [];
+// for (let token of tokenize("~1024 + 10 * 25")) {
+for (let token of tokenize("5 + 1024 * 2")) {
+  if (token.type !== "Whitespace" && token.type !== "LineTerminator") {
+    source.push(token);
+  }
+}
+console.log(Expression(source));
 </script>
 </html>
