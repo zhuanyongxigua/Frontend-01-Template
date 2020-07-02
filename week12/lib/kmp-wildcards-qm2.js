@@ -1,31 +1,31 @@
 function find(source, pattern) {
   let table = new Array(source.length).fill(0);
-  let k = -1;
-  table[0] = -1;
-  for (let i = 0; i < source.length - 1; i++) {
-    if (k === -1 || source[k] === source[i]) {
+  let k = 0;
+  for (let j = 1; j < source.length; j++) {
+    if (source[j] === source[k]) {
       k++;
-      table[i + 1] = k;
     } else {
-      k = table[k];
-      i--;
+      k = 0;
     }
+    table[j] = k;
   }
+  let j = 0;
   for (let i = 0; i < source.length; i++) {
-    let j = 0;
-    for (j; j < pattern.length; j++) {
-      if (source[i] === pattern[j] || pattern[j] === '?') {
-        i++;
+    if (source[i] === pattern[j] || pattern[j] === '?') {
+      j++;
+    } else {
+      while (source[i] !== pattern[j] && pattern[j] !== '?' && j > 0) {
+        j = table[j - 1];
+      }
+      if (source[i] === pattern[j] || pattern[j] === "?") {
+        j++;
       } else {
-        break;
+        j = 0;
       }
     }
-    i -= j;
     if (j === pattern.length) {
       return true;
     }
-    let move = j - table[j];
-    i += move - 1;
   }
   return false;
 }
