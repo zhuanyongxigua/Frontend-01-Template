@@ -3,7 +3,7 @@ function find(source, pattern) {
   let k = -1;
   table[0] = -1;
   for (let i = 0; i < source.length - 1; i++) {
-    if (k === -1 || source[k] === source[i] || source[k] === '?' || source[i] === '?') {
+    if (k === -1 || source[k] === source[i]) {
       k++;
       table[i + 1] = k;
     } else {
@@ -11,23 +11,11 @@ function find(source, pattern) {
       i--;
     }
   }
-  // let j = 0;
-  // while (j < source.length - 1) {
-  //   if (k === -1 || source[k] === source[j] || source[k] === '?' || source[j] === '?') {
-  //     k++;
-  //     j++;
-  //     table[j] = k;
-  //   } else {
-  //     k = table[k];
-  //   }
-  // }
-  let i = 0;
-  while (i < source.length) {
+  for (let i = 0; i < source.length; i++) {
     let j = 0;
-    while (j < pattern.length) {
+    for (j; j < pattern.length; j++) {
       if (source[i] === pattern[j] || pattern[j] === '?') {
         i++;
-        j++;
       } else {
         break;
       }
@@ -37,13 +25,9 @@ function find(source, pattern) {
       return true;
     }
     let move = j - table[j];
-    i += move;
+    i += move - 1;
   }
   return false;
 }
-
-console.log(find('abcdeabcdeabcda', 'ab??eabcda'));
-console.log(find('abcdeabcdeabcda', 'abcd??bcda'));
-console.log(find('abcdeabcdeabcda', 'abcde??cda'));
 
 module.exports = find

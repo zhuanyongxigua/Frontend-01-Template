@@ -100,6 +100,7 @@ describe('kmp match multiple question mark', function() {
     assert.ok(find('abcde', 'a?c?e'));
     assert.ok(!find('bbcde', 'a?c?e'));
     assert.ok(find('abcabcade', 'a?cabca?e'));
+    assert.ok(!find('abbabcade', 'a?cabca?e'));
     assert.ok(find('abcde', 'a???e'));
     assert.ok(find('abcabcade', 'a?c???a?e'));
     assert.ok(find('abcabcade', 'a?c?b?a?e'));
