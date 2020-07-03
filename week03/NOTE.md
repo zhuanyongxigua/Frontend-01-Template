@@ -1004,6 +1004,28 @@ Object.getOwnPropertyDescriptor(o, "length") // It is a data property, not a acc
 
 最后在讲UTF-8的作业。
 
+### JS 中难以复现的对象
+* Date
+* RegExp
+* Map
+* Set
+* Arguments
+* Error
+*循环引用的 Object
+
+### 特殊对象
+- Bound Function
+    - [[BoundTargetFunction]]
+    - [[BoundThis]]
+    - [[BoundArguments]]
+    - [[Call]]
+    - [[Construct]]
+- Array
+- String
+- Arguments
+- Integer-Indexed
+- Module
+- Object.prototype
 
 
 ## 课件：
