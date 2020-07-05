@@ -1,31 +1,31 @@
-const http = require('http')
+const http = require('http');
 
 const server = http.createServer((req, res) => {
-    console.log("request received");
-    console.log(req.headers);
-    res.setHeader('Content-Type', 'text/html')
-    res.setHeader('X-Foo', 'bar')
-    res.writeHeader(200, { 'Content-Type': 'text/plain' })
-    res.end(
+  console.log("request received");
+  console.log(req.headers);
+  res.setHeader('Content-Type', 'text/html');
+  res.setHeader('X-Foo', 'bar');
+  res.writeHeader(200, { 'Content-Type': 'text/plain' });
+  res.end(
 `<html maaa=a >
 <head>
-    <style>
+  <style>
 body div #myid {
-    width: 100px;
-    background-color: #ff5000;
+  width: 100px;
+  background-color: #ff5000;
 }
-body div img {
-    width: 30px;
-    background-color: #ff1111;
+body div img 
+  width: 30px;
+  background-color: #ff1111;
 }
-    </style>
+  </style>
 </head>
 <body>
-    <div>
-        <img id="myid"/>
-        <img />
-    </div>
+  <div>
+    <img id="myid"/>
+    <img />
+  </div>
 </body>
 </html>`) 
-}) 
-server.listen(8088)
+});
+server.listen(8088);
