@@ -14,7 +14,7 @@ body div #myid {
   width: 100px;
   background-color: #ff5000;
 }
-body div img 
+body div img {
   width: 30px;
   background-color: #ff1111;
 }

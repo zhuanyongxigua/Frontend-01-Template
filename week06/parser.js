@@ -4,16 +4,15 @@ const css = require('css');
 // 由于字符会占位，所以不能用string，但是用对象什么的是可以的，这个地方没明白
 const EOF = Symbol('EOF'); // End of File
 
-
 let currentToken = null;
 let currentAttribute = null;
+let currentTextNode = null;
 
 let stack = [{ type: 'document', children: []}];
 
 let rules = [];
 function addCSSRules(text) {
   var ast = css.parse(text);
-  console.log(JSON.stringify(ast, null, "     "));
   rules.push(...ast.stylesheet.rules);
 }
 
@@ -47,7 +46,7 @@ function specificity(selector) {
   var selectorParts = selector.split(' ');
   for (const part of selectorParts) {
     // 可以在这里加正则把复合选择器也拆开
-    if (part.charAt(0) === '0') {
+    if (part.charAt(0) === '#') {
       p[1] += 1;
     } else if (part.charAt(0) === '.') {
       p[2] += 1;
@@ -60,13 +59,13 @@ function specificity(selector) {
 
 function compare(sp1, sp2) {
   if (sp1[0] - sp2[0]) {
-    return sp1[0] = sp2[0];
+    return sp1[0] - sp2[0];
   }
   if (sp1[1] - sp2[1]) {
-    return sp2[1] = sp2[1];
+    return sp2[1] - sp2[1];
   }
   if (sp1[2] - sp2[2]) {
-    return sp1[2] = sp2[2];
+    return sp1[2] - sp2[2];
   }
   return sp1[3] - sp2[3];
 }
@@ -112,16 +111,11 @@ function computeCSS(element) {
           computedStyle[declaration.property].specificity = sp;
         }
       }
-      console.log(element.computedStyle);
     }
   }
 }
 
 function emit(token) {
-  if(token.type !== 'text') {
-    console.log(token);
-    return;
-  }
   let top = stack[stack.length - 1];
   if (token.type === 'startTag') {
     let element = {
@@ -130,7 +124,7 @@ function emit(token) {
       attributes: []
     }
     element.tagName = token.tagName;
-    for(let n in token) {
+    for(let p in token) {
       if (p !== 'type' && p !== 'tagName') {
         element.attributes.push({
           name: p,
@@ -200,6 +194,10 @@ function tagOpen(c) {
     }
     return tagName(c);
   } else {
+    emit({
+      type: 'text',
+      content: c
+    });
     return;
   }
 }
@@ -225,13 +223,14 @@ function tagName(c) {
     return beforeAttributeName;
   } else if(c === '/') {
     return selfClosingStartTag;
-  } else if(c.match(/^[a-zA-Z]$/)) {
-    currentToken.tagName += c;
+  } else if(c.match(/^[A-Z]$/)) {
+    currentToken.tagName += c; // toLowerCase()
     return tagName;
   } else if (c === '>') {
     emit(currentToken);
     return data;
   } else {
+    currentToken.tagName += c;
     return tagName;
   }
 }
@@ -251,9 +250,33 @@ function beforeAttributeName(c) {
   }
 }
 
+function afterAttributeName(c) {
+  if (c.match(/^[\t\n\f ]$/)) {
+    return afterAttributeName;
+  } else if(c === "/") {
+    return selfClosingStartTag;
+  } else if (c === "=") {
+    return beforeAttributeValue;
+  } else if (c === ">") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    emit(currentToken);
+    return data;
+  } else if (c === EOF) {
+
+  } else {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    currentAttribute = {
+      name: "",
+      value: ""
+    };
+    return attributeName(c);
+  }
+}
+
 function selfClosingStartTag(c) {
   if(c === '>') {
     currentToken.isSelfClosing = true;
+    emit(currentToken);
     return data;
   } else if(c === 'EOF') {
 
@@ -267,7 +290,7 @@ function attributeName(c) {
     return afterAttributeName(c);
   } else if(c === '=') {
     return beforeAttributeValue;
-  } else if (c === '\r0000') {
+  } else if (c === '\u0000') {
 
   } else if (c === '\"' || c === "'" || c === '<') {
 
@@ -285,18 +308,38 @@ function beforeAttributeValue(c) {
   } else if (c === '\'') {
     return singleQuoteAttributeValue;
   } else if (c === '>') {
-
+    return data;
   } else {
     return UnquotedAttributeValue(c);
   }
 }
 
 function doubleQuotedAttributeValue(c) {
+  if (c === "\"") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return afterQuotedAttributeValue;
+  } else if (c === "\u0000") {
 
+  } else if (c === EOF) {
+
+  } else {
+    currentAttribute.value += c;
+    return doubleQuotedAttributeValue;
+  }
 }
 
 function singleQuoteAttributeValue(c) {
+  if (c === "\'") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    return afterQuotedAttributeValue;
+  } else if (c === "\u0000") {
 
+  } else if (c === EOF) {
+
+  } else {
+    currentAttribute.value += c;
+    return doubleQuotedAttributeValue;
+  }
 }
 
 function afterQuotedAttributeValue(c) {
