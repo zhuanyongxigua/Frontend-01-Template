@@ -134,7 +134,7 @@ function layout(element) {
 
     if (itemStyle.flex) {
       flexLine.push(item);
-    } else if (style.flexWrap === 'nowrap' && isAutoMainSpace) {
+    } else if (style.flexWrap === 'nowrap' && isAutoMainSize) {
       mainSpace -= itemStyle[mainSize];
       if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
         crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
@@ -260,7 +260,7 @@ function layout(element) {
   } else {
     crossBase = 0;
   }
-  var lineSize = style[crossSize] / flexLines.length;
+  // var lineSize = style[crossSize] / flexLines.length;
   var step;
   if (style.alignContent === 'flex-start') {
     crossBase += 0;
@@ -317,7 +317,6 @@ function layout(element) {
     }
     crossBase += crossSign * (lineCrossSize + step);
   });
-  console.log(items);
 }
 
 module.exports = layout;

@@ -1,5 +1,7 @@
 const net = require('net');
 const parser = require('./parser');
+const images = require('images');
+const render = require('./render');
 
 class TrunkedBodyParser {
   constructor() {
@@ -216,7 +218,9 @@ void async function() {
   // 正常这里应该做成generator的形式的，但是太麻烦，就简化了
   let response = await request.send();
   let dom = parser.parseHTML(response.body);
-  console.log(JSON.stringify(dom, null, '    '));
+  let viewport = images(800, 600);
+  render(viewport, dom);
+  viewport.save('viewport.jpg');
 }()
 
 class Response {
