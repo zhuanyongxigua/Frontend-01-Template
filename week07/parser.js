@@ -1,8 +1,10 @@
 const css = require('css');
+const layout = require('./layout');
 // 有EOF的原因是，字符可以是一段一段传过来的
 // 编译器不知道当前这一段是不是最后一段，所以可能就会处在一个等待字符补全的状态
 // 由于字符会占位，所以不能用string，但是用对象什么的是可以的，这个地方没明白
 const EOF = Symbol('EOF'); // End of File
+
 
 let currentToken = null;
 let currentAttribute = null;
@@ -152,6 +154,7 @@ function emit(token) {
       if (top.tagName === 'style') {
         addCSSRules(top.children[0].content);
       }
+      layout(top);
       stack.pop();
     }
     currentTextNode = null
@@ -388,5 +391,5 @@ module.exports.parseHTML = function parseHTML(html) {
     state = state(c);
   }
   state = state(EOF);
-  return state[0];
+  return stack[0];
 }
