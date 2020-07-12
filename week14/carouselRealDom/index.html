@@ -1,31 +1,47 @@
-import { createElement, Text, Wrapper } from './createElement';
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>carousel component</title>
+  <style>
+    .carousel {
+      width: 500px;
+      height: 300px;
+      overflow: hidden;
+      /* outline的好处是不会参与任何的layout，也可能是坏处，所以展示的时候可以用这个 */
+      /* 对于轮播图来说没有意义，最后是要去掉的 */
+      outline: 1px solid blue;
+      white-space: nowrap;
+      margin: auto;
+    }
+    .carousel>img {
+      width: 100%;
+      height: 100%;
+      display: inline-block;
+      transition: transform ease 1s;
+    }
 
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  
+<!-- <script src="./main.js"></script> -->
+<script>
 class Carousel {
-  constructor(config) {
-    this.children = [];
-    this.attributes = new Map();
-    this.properties = new Map();
-  }
-  setAttribute(name, value) {
-    // this.attributes.set(name, value);
-    this[name] = value;
-  }
-  appendChild(child) {
-    this.children.push(child);
-  }
-  mountTo(parent) {
-    this.render().mountTo(parent);
+  constructor() {
+    this.root = null;
+    this.data = null;
   }
   render() {
-    // JSX的组件是一等公民，可以随便的赋值给变量，这是非常舒服的地方
-    let children = this.data.map(url => {
-      let element = <img src={url} />;
+    this.root = document.createElement('div');
+    this.root.classList.add('carousel');
+    for (const d of this.data) {
+      let element = document.createElement('img');
+      element.src = d;
       element.addEventListener('dragstart', event => event.preventDefault());
-      return element;
-    });
-    let root = <div class="carousel">
-      {children}
-    </div>
+      this.root.appendChild(element);
+    }
     let position = 0;
     let nextPic = () => {
       // 注意这里不能有任何的DOM操作，因为我们是一个纯粹的视觉展现的东西
@@ -33,8 +49,8 @@ class Carousel {
       // 行为会不可预期，元素之间的顺序变了
       let nextPosition = (position + 1) % this.data.length;
 
-      let current = children[position];
-      let next = children[nextPosition];
+      let current = this.root.childNodes[position];
+      let next = this.root.childNodes[nextPosition];
 
       current.style.transition = 'ease 0s';
       next.style.transition = 'ease 0s';
@@ -56,17 +72,35 @@ class Carousel {
         position = nextPosition;
       }, 16);
 
+
+      // 第一个requestAnimationFrame是上面那一组CSS生效的过程
+      // 因为这个API是下一祯开始生效
+      // 第二个才是下一个
+      // 可以写一个文章，setTimeout16好面跟requestAnimation是不完全等价的
+      // 不适合实际这样用，用的话需要写注释提示同事
+      // requestAnimationFrame(function() {
+      //   requestAnimationFrame(function() {
+      //     current.style.transition = 'ease 0.5s';
+      //     next.style.transition = 'ease 0.5s';
+
+      //     current.style.transform = `translateX(${- 100 - 100 * position}%)`;
+      //     next.style.transform = `translateX(${- 100 * nextPosition}%)`;
+
+      //     position = nextPosition;
+      //   })
+      // });
+
       setTimeout(nextPic, 3000);
     }
-    root.addEventListener('mousedown', event => {
+    this.root.addEventListener('mousedown', event => {
       let startX = event.clientX, startY = event.clientY;
 
       let lastPosition = (position - 1 + this.data.length) % this.data.length;
       let nextPosition = (position + 1) % this.data.length;
 
-      let current = children[position];
-      let last = children[lastPosition];
-      let next = children[nextPosition];
+      let current = this.root.childNodes[position];
+      let last = this.root.childNodes[lastPosition];
+      let next = this.root.childNodes[nextPosition];
 
       current.style.transition = 'ease 0s';
       last.style.transition = 'ease 0s';
@@ -110,23 +144,21 @@ class Carousel {
       document.addEventListener('mouseup', up);
     })
     // setTimeout(nextPic, 3000);
-    return root
   }
 }
-
-// let component = <div id="a" class="b" style="width: 100px;height: 100px;background-color: lightgreen;">
-//   <div></div>
-//   <div></div>
-//   <div></div> 
-//   <div></div>
-// </div>
-let component = <Carousel data={[
+// new的时候尽量不带参数
+// create
+let carousel = new Carousel();
+// update
+carousel.data = [
   "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
   "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
   "https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
   "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
-]}/>
-
-component.mountTo(document.body);
-
-// component.
+]
+carousel.render();
+// mount
+document.getElementById('container').appendChild(carousel.root);
+</script>
+</body>
+</html>
