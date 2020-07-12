@@ -7,7 +7,6 @@ class Carousel {
     this.properties = new Map();
   }
   setAttribute(name, value) {
-    // this.attributes.set(name, value);
     this[name] = value;
   }
   appendChild(child) {
@@ -114,12 +113,6 @@ class Carousel {
   }
 }
 
-// let component = <div id="a" class="b" style="width: 100px;height: 100px;background-color: lightgreen;">
-//   <div></div>
-//   <div></div>
-//   <div></div> 
-//   <div></div>
-// </div>
 let component = <Carousel data={[
   "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
   "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
@@ -128,5 +121,3 @@ let component = <Carousel data={[
 ]}/>
 
 component.mountTo(document.body);
-
-// component.
