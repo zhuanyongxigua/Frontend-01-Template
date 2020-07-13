@@ -7,12 +7,13 @@
     .carousel {
       width: 500px;
       height: 300px;
-      overflow: hidden;
+      /* overflow: hidden; */
       /* outline的好处是不会参与任何的layout，也可能是坏处，所以展示的时候可以用这个 */
       /* 对于轮播图来说没有意义，最后是要去掉的 */
       outline: 1px solid blue;
       white-space: nowrap;
       margin: auto;
+      zoom: 0.5;
     }
     .carousel>img {
       width: 100%;
@@ -42,6 +43,7 @@ class Carousel {
       element.addEventListener('dragstart', event => event.preventDefault());
       this.root.appendChild(element);
     }
+    // position表示当前展示的位置是第几个图片
     let position = 0;
     let nextPic = () => {
       // 注意这里不能有任何的DOM操作，因为我们是一个纯粹的视觉展现的东西
@@ -72,7 +74,6 @@ class Carousel {
         position = nextPosition;
       }, 16);
 
-
       // 第一个requestAnimationFrame是上面那一组CSS生效的过程
       // 因为这个API是下一祯开始生效
       // 第二个才是下一个
@@ -92,6 +93,7 @@ class Carousel {
 
       setTimeout(nextPic, 3000);
     }
+
     this.root.addEventListener('mousedown', event => {
       let startX = event.clientX, startY = event.clientY;
 
@@ -143,7 +145,7 @@ class Carousel {
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
     })
-    // setTimeout(nextPic, 3000);
+    setTimeout(nextPic, 3000);
   }
 }
 // new的时候尽量不带参数
@@ -154,7 +156,7 @@ carousel.data = [
   "https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
   "https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
   "https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
-  "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
+  // "https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg",
 ]
 carousel.render();
 // mount
