@@ -7,13 +7,12 @@ export class Timeline {
     // 写在这个地方就可以用箭头函数，写在class里面this是不固定的
     this.tick = () => {
       let t = Date.now() - this.startTime;
-      console.log(t);
       let animations = this.animations.filter(animation => !animation.finished)
       for (const animation of this.animations) {
         // if (t > animation.duration + animation.delay) {
         //   t = animation.duration + animation.delay;
         // }
-        let { object, property, start, end, timingFunction, delay, duration, template, addTime } = animation;
+        let { object, property, timingFunction, delay, duration, template, addTime } = animation;
 
         let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
         // if (t > animation.duration + animation.delay) {
@@ -41,6 +40,10 @@ export class Timeline {
     if (this.requestID !== null) {
       cancelAnimationFrame(this.requestID);
     }
+  }
+
+  clear() {
+    this.animations.length = 0;
   }
 
   resume() {
@@ -101,7 +104,6 @@ export class Animation {
 
   valueFromProgression(progression) {
     return this.start + progression * (this.end - this.start);
-
   }
 }
 
