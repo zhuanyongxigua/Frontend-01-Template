@@ -164,6 +164,8 @@ function endTagOpen(c) {
   }
 }
 
+// 为了处理script标签内的字符影响解析
+
 function scriptData(c) {
   if (c == '<') {
     return scriptDataLessThanSign;

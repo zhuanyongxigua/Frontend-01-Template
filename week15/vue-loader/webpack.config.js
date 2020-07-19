@@ -18,6 +18,12 @@ module.exports = {
             ]
           }
         }
+      },
+      {
+        test: /\.view/,
+        use:{
+          loader: require.resolve("./myloader.js")
+        }
       }
     ]
   },
