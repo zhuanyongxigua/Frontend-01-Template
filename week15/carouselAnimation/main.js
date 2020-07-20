@@ -45,39 +45,41 @@ class Carousel {
       let current = children[position];
       let next = children[nextPosition];
 
-      // tl.clear();
-      // tl.add(new Animation(current.style, 'transform', 0, 100, 3000, 0, linear, v => {
-      //   console.log('target-add1', v);
-      //   return `translateX(${ - v * position}%)`
-      // }));
-      // tl.add(new Animation(next.style, 'transform', 0, 100, 3000, 0, linear, v => { 
-      //   console.log('target-add2', v);
-      //   return `translateX(${- v * nextPosition}%)`
-      // }));
-      // tl.start();
+      // 这里就是把下一个挪到起始位置，再new一个Animation的话没有意义
+      next.style.transform = `translateX(${100 - 100 * nextPosition}%)`;
 
       // 这里加setTimeout是因为transition生效是需要间隔的
       setTimeout(function() {
         tl.clear();
-        console.log(position);
+        let firstStatus = false;
+        let secondStatus = false;
         tl.add(new Animation(current.style, 'transform', 0, 100, 3000, 0, linear, v => {
-          console.log('start-add1', v);
           if (v === 100) {
-            console.log(position);
-            position = nextPosition;
+            firstStatus = true;
+            if (secondStatus) {
+              position = nextPosition;
+              nextPic();
+              // 由于position被改了，所以下面的表达式也要跟着变化一下
+              return `translateX(${ - v * position}%)`
+            }
           }
           return `translateX(${ - v - 100 * position}%)`
         }));
         tl.add(new Animation(next.style, 'transform', 0, 100, 3000, 0, linear, v => { 
-          // console.log('start-add2', v);
-          return `translateX(${ - v * nextPosition}%)`
+          if (v === 100) {
+            secondStatus = true;
+            if (firstStatus) {
+              position = nextPosition;
+              nextPic();
+              // 由于position被改了，所以下面的表达式也要跟着变化一下
+              return `translateX(${ - v * position}%)`
+            }
+          }
+          return `translateX(${ - v - 100 * (nextPosition - 1)}%)`
         }));
         tl.start();
 
-        // position = nextPosition;
       }, 16);
-
-      setTimeout(nextPic, 3000);
     }
     root.addEventListener('mousedown', event => {
       let startX = event.clientX, startY = event.clientY;

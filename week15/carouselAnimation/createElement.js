@@ -44,7 +44,6 @@ export class Wrapper {
     return this.root.style;
   }
   setAttribute(name, value) {
-    console.log(name, value);
     this.root.setAttribute(name, value);
   }
   appendChild(child) {

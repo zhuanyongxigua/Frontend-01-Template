@@ -14,6 +14,7 @@ export class Timeline {
         // }
         let { object, property, timingFunction, delay, duration, template, addTime } = animation;
 
+        // console.log(t, delay, addTime, duration);
         let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
         // if (t > animation.duration + animation.delay) {
         if (t > duration + delay + addTime) {
@@ -24,6 +25,10 @@ export class Timeline {
         let value = animation.valueFromProgression(progression);
 
         object[property] = template(value);
+
+        if (progression === 1) {
+          this.animations = [];
+        }
       }
       if (animations.length) {
         this.requestID = requestAnimationFrame(this.tick);
@@ -43,6 +48,7 @@ export class Timeline {
   }
 
   clear() {
+    this.state = 'inited';
     this.animations.length = 0;
   }
 
