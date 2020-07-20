@@ -38,7 +38,7 @@ class Carousel {
       current.style.transition = 'ease 0s';
       next.style.transition = 'ease 0s';
 
-      // 终止位置
+      // 起始位置
       current.style.transform = `translateX(${ - 100 * position}%)`;
       next.style.transform = `translateX(${100 - 100 * nextPosition}%)`;
 
@@ -108,7 +108,7 @@ class Carousel {
       document.addEventListener('mousemove', move);
       document.addEventListener('mouseup', up);
     })
-    // setTimeout(nextPic, 3000);
+    setTimeout(nextPic, 3000);
     return root
   }
 }
