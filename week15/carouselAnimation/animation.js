@@ -26,6 +26,7 @@ export class Timeline {
 
         object[property] = template(value);
 
+        // 这种处理不好，不能restart了
         if (progression === 1) {
           this.animations = [];
         }
