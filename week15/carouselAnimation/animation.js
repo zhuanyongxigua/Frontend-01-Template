@@ -9,14 +9,9 @@ export class Timeline {
       let t = Date.now() - this.startTime;
       let animations = this.animations.filter(animation => !animation.finished)
       for (const animation of this.animations) {
-        // if (t > animation.duration + animation.delay) {
-        //   t = animation.duration + animation.delay;
-        // }
         let { object, property, timingFunction, delay, duration, template, addTime } = animation;
 
-        // console.log(t, delay, addTime, duration);
         let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
-        // if (t > animation.duration + animation.delay) {
         if (t > duration + delay + addTime) {
           progression = 1;
           animation.finished = true;

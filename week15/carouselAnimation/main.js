@@ -32,7 +32,7 @@ class Carousel {
     </div>
     let position = 0;
     let tl = new Timeline;
-    let linear = t => t;
+    let ease = cubicBezier(0.25, .1, .25 ,1);
     let nextPic = () => {
       // 注意这里不能有任何的DOM操作，因为我们是一个纯粹的视觉展现的东西
       // 如果在这里重新append一下，不但改变了视觉效果，也改变了结构，语义也变了
@@ -53,7 +53,7 @@ class Carousel {
         tl.clear();
         let firstStatus = false;
         let secondStatus = false;
-        tl.add(new Animation(current.style, 'transform', 0, 100, 3000, 0, linear, v => {
+        tl.add(new Animation(current.style, 'transform', 0, 100, 1000, 0, ease, v => {
           if (v === 100) {
             firstStatus = true;
             if (secondStatus) {
@@ -65,7 +65,7 @@ class Carousel {
           }
           return `translateX(${ - v - 100 * position}%)`
         }));
-        tl.add(new Animation(next.style, 'transform', 0, 100, 3000, 0, linear, v => { 
+        tl.add(new Animation(next.style, 'transform', 0, 100, 1000, 0, ease, v => { 
           if (v === 100) {
             secondStatus = true;
             if (firstStatus) {
@@ -79,7 +79,8 @@ class Carousel {
         }));
         tl.start();
 
-      }, 16);
+      // }, 16);
+      }, 3000);
     }
     root.addEventListener('mousedown', event => {
       let startX = event.clientX, startY = event.clientY;
@@ -136,7 +137,7 @@ class Carousel {
       isStop = true;
       // tl.pause()
     });
-    setTimeout(nextPic, 3000);
+    setTimeout(nextPic, 16);
     return root
   }
 }
