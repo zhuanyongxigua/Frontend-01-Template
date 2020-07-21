@@ -20,7 +20,7 @@ export class Timeline {
           progression = 1;
         }
 
-        if (animation.finished !== true) {
+        if (!animation.finished) {
           let value = animation.valueFromProgression(progression);
 
           object[property] = template(value);

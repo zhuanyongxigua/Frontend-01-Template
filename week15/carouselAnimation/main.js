@@ -26,9 +26,13 @@ class Carousel {
     });
     let stopBtn = <button>stop</button>
     let isStop = false;
-    let root = <div class="carousel">
-      {children}
-      {stopBtn}
+    let root = <div class="container">
+      <div class="carousel">
+        {children}
+      </div>
+      <div class="btn-container">
+        {stopBtn}
+      </div>
     </div>
     let position = 0;
     let tl = new Timeline;
@@ -82,60 +86,9 @@ class Carousel {
       // }, 16);
       }, 3000);
     }
-    root.addEventListener('mousedown', event => {
-      let startX = event.clientX, startY = event.clientY;
-
-      let lastPosition = (position - 1 + this.data.length) % this.data.length;
-      let nextPosition = (position + 1) % this.data.length;
-
-      let current = children[position];
-      let last = children[lastPosition];
-      let next = children[nextPosition];
-
-      current.style.transition = 'ease 0s';
-      last.style.transition = 'ease 0s';
-      next.style.transition = 'ease 0s';
-
-      current.style.transform = `translateX(${- 500 * position}px)`;
-      last.style.transform = `translateX(${- 500 - 500 * lastPosition}px)`;
-      next.style.transform = `translateX(${500 - 500 * nextPosition}px)`;
-
-      let move = event => {
-        // current.style.transition = 'ease 0s';
-        current.style.transform = `translateX(${event.clientX - startX - 500 * position}px)`;
-        last.style.transform = `translateX(${event.clientX - startX - 500 - 500 * lastPosition}px)`;
-        next.style.transform = `translateX(${event.clientX - startX + 500 - 500 * nextPosition}px)`;
-      }
-      let up = event => {
-        let offset = 0;
-        if (event.clientX - startX > 250) {
-          offset = 1;
-        } else if (event.clientX - startX < -250) {
-          offset = -1;
-        }
-        // 把transition打开
-        // 平时用的时候这样写一定要加注释，非常的反直觉
-        current.style.transition = '';
-        last.style.transition = '';
-        next.style.transition = '';
-
-        current.style.transform = `translateX(${offset * 500 - 500 * position}px)`;
-        last.style.transform = `translateX(${offset * 500 - 500 - 500 * lastPosition}px)`;
-        next.style.transform = `translateX(${offset * 500 + 500 - 500 * nextPosition}px)`;
-
-        position = (position - offset + this.data.length) % this.data.length;
-
-        document.removeEventListener('mousemove', move);
-        document.removeEventListener('mouseup', up);
-      }
-      // 如果在移动端还有touch事件的问题
-      // 还要使用touch事件
-      document.addEventListener('mousemove', move);
-      document.addEventListener('mouseup', up);
-    })
     stopBtn.addEventListener('click', () => {
       isStop = true;
-      // tl.pause()
+      tl.pause()
     });
     setTimeout(nextPic, 16);
     return root
