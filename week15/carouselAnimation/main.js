@@ -25,6 +25,8 @@ class Carousel {
       return element;
     });
     let stopBtn = <button>stop</button>
+    let resumeBtn = <button>resume</button>
+    let restartBtn = <button>restart</button>
     let isStop = false;
     let root = <div class="container">
       <div class="carousel">
@@ -32,18 +34,14 @@ class Carousel {
       </div>
       <div class="btn-container">
         {stopBtn}
+        {resumeBtn}
+        {restartBtn}
       </div>
     </div>
     let position = 0;
     let tl = new Timeline;
     let ease = cubicBezier(0.25, .1, .25 ,1);
     let nextPic = () => {
-      // 注意这里不能有任何的DOM操作，因为我们是一个纯粹的视觉展现的东西
-      // 如果在这里重新append一下，不但改变了视觉效果，也改变了结构，语义也变了
-      // 行为会不可预期，元素之间的顺序变了
-      if (isStop) {
-        return;
-      }
       let nextPosition = (position + 1) % this.data.length;
 
       let current = children[position];
@@ -54,7 +52,9 @@ class Carousel {
 
       // 这里加setTimeout是因为transition生效是需要间隔的
       setTimeout(function() {
-        tl.clear();
+        if (isStop) {
+          return;
+        }
         let firstStatus = false;
         let secondStatus = false;
         tl.add(new Animation(current.style, 'transform', 0, 100, 1000, 0, ease, v => {
@@ -63,6 +63,7 @@ class Carousel {
             if (secondStatus) {
               position = nextPosition;
               nextPic();
+              tl.clear();
               // 由于position被改了，所以下面的表达式也要跟着变化一下
               return `translateX(${ - v * position}%)`
             }
@@ -75,6 +76,7 @@ class Carousel {
             if (firstStatus) {
               position = nextPosition;
               nextPic();
+              tl.clear();
               // 由于position被改了，所以下面的表达式也要跟着变化一下
               return `translateX(${ - v * position}%)`
             }
@@ -87,9 +89,29 @@ class Carousel {
       }, 3000);
     }
     stopBtn.addEventListener('click', () => {
-      isStop = true;
-      tl.pause()
+      if (tl.state === tl.PLAYING) {
+        tl.pause()
+      } else {
+        isStop = true;
+      }
     });
+    resumeBtn.addEventListener('click', () => {
+      if (isStop) {
+        isStop = false;
+        setTimeout(nextPic, 16);
+      } else {
+        tl.resume();
+      }
+    })
+    restartBtn.addEventListener('click', () => {
+      isStop = false;
+      tl.clear();
+      children.forEach(child => {
+        child.style.transform = '';
+      })
+      position = 0;
+      setTimeout(nextPic, 16);
+    })
     setTimeout(nextPic, 16);
     return root
   }
