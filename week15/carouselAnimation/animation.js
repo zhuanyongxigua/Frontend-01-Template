@@ -3,7 +3,11 @@ export class Timeline {
   constructor() {
     this.animations = [];
     this.requestID = null;
-    this.state = "inited";
+    this.INITED = 0;
+    this.PLAYING = 1;
+    this.PAUSE = 2;
+    this.FINISHED = 3;
+    this.state = this.INITED;
     // 写在这个地方就可以用箭头函数，写在class里面this是不固定的
     this.tick = () => {
       let t = Date.now() - this.startTime;
@@ -14,16 +18,16 @@ export class Timeline {
         let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
         if (t > duration + delay + addTime) {
           progression = 1;
-          animation.finished = true;
         }
 
-        let value = animation.valueFromProgression(progression);
+        if (animation.finished !== true) {
+          let value = animation.valueFromProgression(progression);
 
-        object[property] = template(value);
+          object[property] = template(value);
+        }
 
-        // 这种处理不好，不能restart了
         if (progression === 1) {
-          this.animations = [];
+          animation.finished = true;
         }
       }
       if (animations.length) {
@@ -33,10 +37,10 @@ export class Timeline {
   }
 
   pause() {
-    if (this.state !== 'playing') {
+    if (this.state !== this.PLAYING) {
       return;
     }
-    this.state = 'pause';
+    this.state = this.PAUSE;
     this.pauseTime = Date.now();
     if (this.requestID !== null) {
       cancelAnimationFrame(this.requestID);
@@ -44,37 +48,37 @@ export class Timeline {
   }
 
   clear() {
-    this.state = 'inited';
+    this.state = this.INITED;
     this.animations.length = 0;
   }
 
   resume() {
-    if (this.state !== 'pause') {
+    if (this.state !== this.PAUSE) {
       return;
     }
-    this.state = 'playing';
+    this.state = this.PLAYING;
     // 为啥是这个？
     this.startTime += Date.now() - this.pauseTime;
     this.tick();
   }
 
   start() {
-    if (this.state !== 'inited') {
+    if (this.state !== this.INITED) {
       return;
     }
-    this.state = 'playing';
+    this.state = this.PLAYING;
     this.startTime = Date.now();
     this.tick();
   }
 
   restart() {
-    if (this.state === 'playing') {
+    if (this.state === this.PLAYING) {
       this.pause();
     }
     this.animations = [];
 
     this.requestID = null;
-    this.state = "playing";
+    this.state = this.PLAYING;
     this.startTime = Date.now();
     this.pauseTime = null;
     this.tick();
@@ -83,7 +87,7 @@ export class Timeline {
   add(animation, addTime) {
     this.animations.push(animation);
     animation.finished = false;
-    if (this.state === 'playing') {
+    if (this.state === this.PLAYING) {
       animation.addTime = addTime !== void 0 ? addTime : Date.now() - this.startTime;
     } else {
       animation.addTime = addTime !== void 0 ? addTime : 0;
