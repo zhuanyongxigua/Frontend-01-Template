@@ -1,4 +1,3 @@
-// 由于css的动画不可控，比如把
 export class Timeline {
   constructor() {
     this.animations = [];
@@ -29,6 +28,9 @@ export class Timeline {
     }
     if (animations.length) {
       this.requestID = requestAnimationFrame(() => this.tick());
+    } else {
+      this.state = this.INITED;
+      this.animations.forEach(animation => animation.finished = false);
     }
   }
 

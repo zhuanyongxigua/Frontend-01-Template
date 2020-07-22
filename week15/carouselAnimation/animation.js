@@ -1,4 +1,3 @@
-// 由于css的动画不可控，比如把
 export class Timeline {
   constructor() {
     this.animations = [];
@@ -8,31 +7,31 @@ export class Timeline {
     this.PAUSE = 2;
     this.FINISHED = 3;
     this.state = this.INITED;
-    // 写在这个地方就可以用箭头函数，写在class里面this是不固定的
-    this.tick = () => {
-      let t = Date.now() - this.startTime;
-      let animations = this.animations.filter(animation => !animation.finished)
-      for (const animation of this.animations) {
-        let { object, property, timingFunction, delay, duration, template, addTime } = animation;
+  }
 
-        let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
-        if (t > duration + delay + addTime) {
-          progression = 1;
-        }
+  tick() {
+    let t = Date.now() - this.startTime;
+    let animations = this.animations.filter(animation => !animation.finished)
+    for (const animation of this.animations) {
+      let { object, property, timingFunction, delay, duration, template, addTime } = animation;
 
-        if (!animation.finished) {
-          let value = animation.valueFromProgression(progression);
-
-          object[property] = template(value);
-        }
-
-        if (progression === 1) {
-          animation.finished = true;
-        }
+      let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
+      if (t > duration + delay + addTime) {
+        progression = 1;
       }
-      if (animations.length) {
-        this.requestID = requestAnimationFrame(this.tick);
+
+      if (!animation.finished) {
+        let value = animation.valueFromProgression(progression);
+
+        object[property] = template(value);
       }
+
+      if (progression === 1) {
+        animation.finished = true;
+      }
+    }
+    if (animations.length) {
+      this.requestID = requestAnimationFrame(() => this.tick());
     }
   }
 
@@ -135,26 +134,3 @@ export class ColorAnimation {
     }
   }
 }
-
-
-/*
-
-let animation = new Animation(object, property, start, end, duration, delay, duration, timingFunction)
-
-animation.start()
-animation.stop()
-animation.pause()
-animation.resume()
-// 如果有两个动画，怎么stop
-性能的原因，所以才会有时间线
-
-let timeline = new Timeline;
-
-timeline.add(animation);
-timeline.add(animation2);
-
-timeline.start()
-timeline.stop()
-
-
-*/
