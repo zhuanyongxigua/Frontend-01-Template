@@ -3,40 +3,40 @@ export class Timeline {
   constructor() {
     this.animations = [];
     this.requestID = null;
-    this.state = "inited";
-    // 写在这个地方就可以用箭头函数，写在class里面this是不固定的
-    this.tick = () => {
-      let t = Date.now() - this.startTime;
-      console.log(t);
-      let animations = this.animations.filter(animation => !animation.finished)
-      for (const animation of this.animations) {
-        // if (t > animation.duration + animation.delay) {
-        //   t = animation.duration + animation.delay;
-        // }
-        let { object, property, start, end, timingFunction, delay, duration, template, addTime } = animation;
+    this.INITED = 0;
+    this.PLAYING = 1;
+    this.PAUSE = 2;
+    this.FINISHED = 3;
+    this.state = this.INITED;
+  }
 
-        let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
-        // if (t > animation.duration + animation.delay) {
-        if (t > duration + delay + addTime) {
-          progression = 1;
-          animation.finished = true;
-        }
+  tick() {
+    let t = Date.now() - this.startTime;
+    console.log(t);
+    let animations = this.animations.filter(animation => !animation.finished)
+    for (const animation of this.animations) {
+      let { object, property, start, end, timingFunction, delay, duration, template, addTime } = animation;
 
-        let value = animation.valueFromProgression(progression);
-
-        object[property] = template(value);
+      let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
+      if (t > duration + delay + addTime) {
+        progression = 1;
+        animation.finished = true;
       }
-      if (animations.length) {
-        this.requestID = requestAnimationFrame(this.tick);
-      }
+
+      let value = animation.valueFromProgression(progression);
+
+      object[property] = template(value);
+    }
+    if (animations.length) {
+      this.requestID = requestAnimationFrame(() => this.tick());
     }
   }
 
   pause() {
-    if (this.state !== 'playing') {
+    if (this.state !== this.PLAYING) {
       return;
     }
-    this.state = 'pause';
+    this.state = this.PAUSE;
     this.pauseTime = Date.now();
     if (this.requestID !== null) {
       cancelAnimationFrame(this.requestID);
@@ -44,32 +44,32 @@ export class Timeline {
   }
 
   resume() {
-    if (this.state !== 'pause') {
+    if (this.state !== this.PAUSE) {
       return;
     }
-    this.state = 'playing';
+    this.state = this.PLAYING;
     // 为啥是这个？
     this.startTime += Date.now() - this.pauseTime;
     this.tick();
   }
 
   start() {
-    if (this.state !== 'inited') {
+    if (this.state !== this.INITED) {
       return;
     }
-    this.state = 'playing';
+    this.state = this.PLAYING;
     this.startTime = Date.now();
     this.tick();
   }
 
   restart() {
-    if (this.state === 'playing') {
+    if (this.state === this.PLAYING) {
       this.pause();
     }
     this.animations = [];
 
     this.requestID = null;
-    this.state = "playing";
+    this.state = this.PLAYING;
     this.startTime = Date.now();
     this.pauseTime = null;
     this.tick();
@@ -78,7 +78,7 @@ export class Timeline {
   add(animation, addTime) {
     this.animations.push(animation);
     animation.finished = false;
-    if (this.state === 'playing') {
+    if (this.state === this.PLAYING) {
       animation.addTime = addTime !== void 0 ? addTime : Date.now() - this.startTime;
     } else {
       animation.addTime = addTime !== void 0 ? addTime : 0;
@@ -127,26 +127,3 @@ export class ColorAnimation {
     }
   }
 }
-
-
-/*
-
-let animation = new Animation(object, property, start, end, duration, delay, duration, timingFunction)
-
-animation.start()
-animation.stop()
-animation.pause()
-animation.resume()
-// 如果有两个动画，怎么stop
-性能的原因，所以才会有时间线
-
-let timeline = new Timeline;
-
-timeline.add(animation);
-timeline.add(animation2);
-
-timeline.start()
-timeline.stop()
-
-
-*/

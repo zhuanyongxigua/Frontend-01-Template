@@ -1,5 +1,8 @@
 module.exports = {
   entry: './main.js',
+  devServer: {
+    host: '192.168.199.120'
+  },
   module: {
     rules: [
       {
