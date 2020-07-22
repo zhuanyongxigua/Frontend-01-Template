@@ -37,7 +37,12 @@ export class Timeline {
     }
   }
 
+  reverse() {
+
+  }
+
   accelerate() {
+    // 总是会跳一下
     let cur = Date.now();
     this.accelerateTimes++;
     for (const animation of this.animations) {
