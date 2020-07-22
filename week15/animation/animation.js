@@ -5,16 +5,18 @@ export class Timeline {
     this.INITED = 0;
     this.PLAYING = 1;
     this.PAUSE = 2;
-    this.FINISHED = 3;
+    this.FINISHED = 4;
     this.state = this.INITED;
+    this.accelerateTimes = 1;
+    this.accelerateTime = null;
   }
 
   tick() {
-    let t = Date.now() - this.startTime;
-    console.log(t);
+    let cur = Date.now();
+    let t = cur - this.startTime;
     let animations = this.animations.filter(animation => !animation.finished)
     for (const animation of this.animations) {
-      let { object, property, start, end, timingFunction, delay, duration, template, addTime } = animation;
+      let { object, property, timingFunction, delay, duration, template, addTime } = animation;
 
       let progression = timingFunction((t - delay - addTime) / duration); // 0-1之前的数
       if (t > duration + delay + addTime) {
@@ -29,8 +31,17 @@ export class Timeline {
     if (animations.length) {
       this.requestID = requestAnimationFrame(() => this.tick());
     } else {
+      console.log(cur-this.startTime);
       this.state = this.INITED;
       this.animations.forEach(animation => animation.finished = false);
+    }
+  }
+
+  accelerate() {
+    let cur = Date.now();
+    this.accelerateTimes++;
+    for (const animation of this.animations) {
+      animation.duration = cur - this.startTime + (animation.duration - cur + this.startTime) / this.accelerateTimes;
     }
   }
 
@@ -68,8 +79,6 @@ export class Timeline {
     if (this.state === this.PLAYING) {
       this.pause();
     }
-    this.animations = [];
-
     this.requestID = null;
     this.state = this.PLAYING;
     this.startTime = Date.now();
@@ -77,6 +86,7 @@ export class Timeline {
     this.tick();
   }
 
+  // addTime就是不想从零开始的时候使用的
   add(animation, addTime) {
     this.animations.push(animation);
     animation.finished = false;
