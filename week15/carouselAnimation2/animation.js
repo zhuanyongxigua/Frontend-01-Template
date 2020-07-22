@@ -55,6 +55,15 @@ export class Timeline {
     this.animations.length = 0;
   }
 
+  reset() {
+    if (this.state === this.PLAYING) {
+      this.pause();
+    }
+    this.state = this.INITED;
+    this.requestID = null;
+    this.pauseTime = null;
+  }
+
   resume() {
     if (this.state !== this.PAUSE) {
       return;
@@ -78,7 +87,7 @@ export class Timeline {
     if (this.state === this.PLAYING) {
       this.pause();
     }
-    this.animations = [];
+    // this.animations = [];
 
     this.requestID = null;
     this.state = this.PLAYING;

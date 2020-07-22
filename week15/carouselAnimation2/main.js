@@ -28,6 +28,7 @@ class Carousel {
     let resumeBtn = <button>resume</button>
     let restartBtn = <button>restart</button>
     let isStop = false;
+    let timer = null;
     let root = <div class="container">
       <div class="carousel">
         {children}
@@ -49,11 +50,11 @@ class Carousel {
     let nextPic = () => {
       tl.start();
       // 这里加setTimeout是因为transition生效是需要间隔的
-      setTimeout(() => {
+      timer = setTimeout(() => {
+        position = (position + 1) % this.data.length;
         if (isStop) {
           return;
         }
-        position = (position + 1) % this.data.length;
         nextPic();
       }, 3000);
     }
@@ -75,12 +76,13 @@ class Carousel {
     })
     restartBtn.addEventListener('click', () => {
       isStop = false;
-      tl.clear();
+      tl.reset();
+      clearTimeout(timer);
       children.forEach(child => {
         child.style.transform = '';
       })
       position = 0;
-      setTimeout(nextPic, 16);
+      setTimeout(nextPic, 3000);
     })
     setTimeout(nextPic, 3000);
     return root
