@@ -50,7 +50,6 @@ class Carousel {
       // 这里就是把下一个挪到起始位置，再new一个Animation的话没有意义
       next.style.transform = `translateX(${100 - 100 * nextPosition}%)`;
 
-      // 这里加setTimeout是因为transition生效是需要间隔的
       setTimeout(function() {
         if (isStop) {
           return;

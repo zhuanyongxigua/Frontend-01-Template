@@ -18,7 +18,6 @@ class Carousel {
     this.render().mountTo(parent);
   }
   render() {
-    // JSX的组件是一等公民，可以随便的赋值给变量，这是非常舒服的地方
     let children = this.data.map(url => {
       let element = <img src={url} />;
       element.addEventListener('dragstart', event => event.preventDefault());
@@ -49,7 +48,6 @@ class Carousel {
     })
     let nextPic = () => {
       tl.start();
-      // 这里加setTimeout是因为transition生效是需要间隔的
       timer = setTimeout(() => {
         position = (position + 1) % this.data.length;
         if (isStop) {
@@ -58,7 +56,6 @@ class Carousel {
         nextPic();
       }, 3000);
     }
-    // 下面几个功能还不太好用
     stopBtn.addEventListener('click', () => {
       if (tl.state === tl.PLAYING) {
         tl.pause()

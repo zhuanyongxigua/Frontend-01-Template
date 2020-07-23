@@ -43,11 +43,13 @@ export class Timeline {
 
   accelerate() {
     // 总是会跳一下
+    console.log(performance.now());
     let cur = Date.now();
     this.accelerateTimes++;
     for (const animation of this.animations) {
       animation.duration = cur - this.startTime + (animation.duration - cur + this.startTime) / this.accelerateTimes;
     }
+    console.log(performance.now());
   }
 
   pause() {
