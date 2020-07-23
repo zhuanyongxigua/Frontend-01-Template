@@ -33,6 +33,7 @@
   <button id="restart">restart</button>
   <button id="accelerate">accelerate+1</button>
   <button id="decelerate">accelerate-1</button>
+  <button id="reverse">reverse</button>
 <script type="module">
 import { Timeline, Animation, ColorAnimation } from './animation.js';
 import { cubicBezier } from './cubicBezier.js';
@@ -48,6 +49,7 @@ document.getElementById('resume-btn').addEventListener('click', () => tl.resume(
 document.getElementById('restart').addEventListener('click', () => tl.restart());
 document.getElementById('accelerate').addEventListener('click', () => tl.accelerate(1));
 document.getElementById('decelerate').addEventListener('click', () => tl.accelerate(-1));
+document.getElementById('reverse').addEventListener('click', () => tl.reverse());
 document.getElementById('change-color').addEventListener('click', () => {
   tl.add(new ColorAnimation(el.style, "backgroundColor", {r: 0, g:0, b:0, a:1}, {r: 255, g: 0, b: 0, a:1}, 5000, 0, linear), 0);
 });

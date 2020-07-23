@@ -9,13 +9,25 @@ export class Timeline {
     this.state = this.INITED;
     this.accelerateTimes = 0;
     this.preTime = null;
+    this.reverseTime = null;
   }
 
   tick() {
     let cur = Date.now();
-    this.startTime = this.startTime - (cur - this.preTime) * this.accelerateTimes;
-    let t = cur - this.startTime;
-    this.preTime = cur;
+    let t = null;
+    if (this.reverseTime) {
+      t = this.reverseTime - (cur - this.reverseTime) - this.startTime;
+    } else {
+      // 这种是把起点向向反方向移动，这样跟终点的移动加成就可以做到倍速了
+      // 试过直接加速到t上面，或者progression，或者改duration的方法
+      // 都失败了，直接加成到t和progression的方法差不多，都会出现问题
+      // 具体原因没有彻底想清楚，总之就是计算cur和pre的时候pre有可能会超过pre
+      // duration的方法由于duration变了，在刚刚变化的时候，计算(t - delay - addTime) / duration
+      // 会跟上一次的结果出现较大的差距，所以会出现跳跃的情况
+      this.startTime = this.startTime - (cur - this.preTime) * this.accelerateTimes;
+      t = cur - this.startTime;
+      this.preTime = cur;
+    }
     let animations = this.animations.filter(animation => !animation.finished)
     for (const animation of this.animations) {
       let { object, property, timingFunction, delay, duration, template, addTime } = animation;
@@ -39,7 +51,7 @@ export class Timeline {
   }
 
   reverse() {
-
+    this.reverseTime = Date.now();
   }
 
   accelerate(num) {
