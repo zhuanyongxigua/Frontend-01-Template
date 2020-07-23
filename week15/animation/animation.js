@@ -7,13 +7,15 @@ export class Timeline {
     this.PAUSE = 2;
     this.FINISHED = 4;
     this.state = this.INITED;
-    this.accelerateTimes = 1;
-    this.accelerateTime = null;
+    this.accelerateTimes = 0;
+    this.preTime = null;
   }
 
   tick() {
     let cur = Date.now();
+    this.startTime = this.startTime - (cur - this.preTime) * this.accelerateTimes;
     let t = cur - this.startTime;
+    this.preTime = cur;
     let animations = this.animations.filter(animation => !animation.finished)
     for (const animation of this.animations) {
       let { object, property, timingFunction, delay, duration, template, addTime } = animation;
@@ -31,7 +33,6 @@ export class Timeline {
     if (animations.length) {
       this.requestID = requestAnimationFrame(() => this.tick());
     } else {
-      console.log(cur-this.startTime);
       this.state = this.INITED;
       this.animations.forEach(animation => animation.finished = false);
     }
@@ -41,15 +42,8 @@ export class Timeline {
 
   }
 
-  accelerate() {
-    // 总是会跳一下
-    console.log(performance.now());
-    let cur = Date.now();
-    this.accelerateTimes++;
-    for (const animation of this.animations) {
-      animation.duration = cur - this.startTime + (animation.duration - cur + this.startTime) / this.accelerateTimes;
-    }
-    console.log(performance.now());
+  accelerate(num) {
+    this.accelerateTimes += num;
   }
 
   pause() {
