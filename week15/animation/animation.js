@@ -16,7 +16,12 @@ export class Timeline {
     let cur = Date.now();
     let t = null;
     if (this.reverseTime) {
+      this.startTime = this.startTime + (cur - this.preTime) * this.accelerateTimes;
       t = this.reverseTime - (cur - this.reverseTime) - this.startTime;
+      this.preTime = cur;
+      if (t <= 0) {
+        return;
+      }
     } else {
       // 这种是把起点向向反方向移动，这样跟终点的移动加成就可以做到倍速了
       // 试过直接加速到t上面，或者progression，或者改duration的方法
@@ -51,7 +56,12 @@ export class Timeline {
   }
 
   reverse() {
-    this.reverseTime = Date.now();
+    if (this.reverseTime) {
+      this.startTIme = this.reverseTime;
+      this.reverseTime = null;
+    } else {
+      this.reverseTime = Date.now();
+    }
   }
 
   accelerate(num) {

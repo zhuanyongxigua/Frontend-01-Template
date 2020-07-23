@@ -83,8 +83,6 @@ class Carousel {
           return `translateX(${ - v - 100 * (nextPosition - 1)}%)`
         }));
         tl.start();
-
-      // }, 16);
       }, 3000);
     }
     stopBtn.addEventListener('click', () => {
