@@ -1,5 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-function enableGesture(element) {
+export function enableGesture(element) {
   let contexts = Object.create(null);
 
   let MOUSE_SYMBOL = Symbol('mouse');
@@ -100,7 +100,6 @@ function enableGesture(element) {
         clientX: point.clientX,
         clientY: point.clientY
       }));
-      console.log('panstart');
     }
 
 
