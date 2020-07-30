@@ -3,6 +3,11 @@ import { Timeline, Animation } from './animation';
 import { cubicBezier } from './cubicBezier';
 import { enableGesture } from './gesture';
 
+import css from './carousel.css';
+
+console.log(css);
+
+
 export class Carousel {
   constructor(config) {
     this.children = [];
