@@ -11,6 +11,7 @@ stdin.setEncoding('utf8');
 
 function getChar() {
   return new Promise(resolve => {
+    // 这里也可以stdin.once
     stdin.on('data', function(key) {
       resolve(key);
     })
