@@ -5,7 +5,7 @@ import carouselCss from './carousel.css';
 
 export class Carousel {
   constructor(config) {
-
+    this.carouseView = null;
   }
   setAttribute(name, value) {
     this[name] = value;
@@ -17,8 +17,13 @@ export class Carousel {
     this.render().mountTo(parent);
   }
   render() {
-    return <CarouselView>
+    this.carouseView = <CarouselView>
       {this.data.map(record => <img src={record}/>)}
     </CarouselView>
+    return <div>
+      {this.carouseView}
+      <button onClick={() => this.carouseView.stop()}>stop</button>
+      <button onClick={() => this.carouseView.restart()}>restart</button>
+    </div>
   }
 }

@@ -1,7 +1,7 @@
 import { createElement, Text, Wrapper } from './createElement';
 import { Timeline, Animation } from './animation';
 import { cubicBezier } from './cubicBezier';
-import { enableGesture } from './gesture';
+// import { enableGesture } from './gesture';
 
 export class CarouselView {
   constructor(config) {
@@ -35,28 +35,10 @@ export class CarouselView {
       let current = children[position];
       let next = children[nextPosition];
 
-      let currentAnimation = new Animation(
-        current.style,
-        "transform",
-        - 100 * position,
-        -100 - 100 * position,
-        500,
-        0,
-        ease,
-        v => {
-          return `translateX(${v}%)`
-        }
-      )
-      let nextAnimation = new Animation(
-        next.style,
-        "transform",
-        100 - 100 * nextPosition,
-        - 100 * nextPosition,
-        500,
-        0,
-        ease,
-        v => `translateX(${v}%)`
-      )
+      let currentAnimation = new Animation(current.style, "transform", - 100 * position,
+        -100 - 100 * position, 500, 0, ease, v => `translateX(${v}%)`)
+      let nextAnimation = new Animation(next.style, "transform", 100 - 100 * nextPosition,
+        - 100 * nextPosition, 500, 0, ease, v => `translateX(${v}%)`)
       this.timeline.add(currentAnimation);
       this.timeline.add(nextAnimation);
       position = nextPosition;
@@ -126,6 +108,7 @@ export class CarouselView {
       }
 
       let element = <div
+        class="carousel-item"
         onStart={onStart}
         onPan={onPan}
         onPanend={onPanend}
