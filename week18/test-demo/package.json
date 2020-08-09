@@ -1,0 +1,25 @@
+{
+  "name": "test-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "coverage": "nyc mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/register": "^7.10.5",
+    "ava": "^3.11.1",
+    "mocha": "^8.1.1",
+    "webpack": "^4.44.1"
+  },
+  "devDependencies": {
+    "@istanbuljs/nyc-config-babel": "^3.0.0",
+    "babel-plugin-istanbul": "^6.0.0",
+    "nyc": "^15.1.0"
+  },
+  "type": "module"
+}
