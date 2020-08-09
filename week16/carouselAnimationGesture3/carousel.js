@@ -103,6 +103,10 @@ export class Carousel {
         let lastElement = children[lastPosition];
         let currentElement = children[currentPosition];
         let nextElement = children[nextPosition];
+        
+        console.log(lastPosition);
+        console.log('lastPositonStart', - 500 - 500 * lastPosition + offset + dx);
+        console.log('lastPositionEnd', - 500 - 500 * lastPosition + direction * 500);
 
         let lastAnimation = new Animation(lastElement.style, 'transform',
           - 500 - 500 * lastPosition + offset + dx, - 500 - 500 * lastPosition + direction * 500, 500, 0, ease, v => `translateX(${v}px)`)

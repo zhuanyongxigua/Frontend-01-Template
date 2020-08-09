@@ -1,5 +1,7 @@
 # 重学前端week17第二节工具链｜整体整理一个工具链的设计
 
+![](http://www.zhuanyongxigua.cn/2020-08-06-tools.png)
+
 初始化工具决定了后面的工具都是什么，怎么用，是最核心的。
 
 vue的初始化工具的就是vue-cli了，react有create-react-app，angular有ng。
