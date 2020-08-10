@@ -95,6 +95,81 @@ it('with property 3', () => {
   assert.ok(count === 3);
 })
 
+it('with property new line', () => {
+  let doc = parseHTML(`<div
+
+id="a"></div>`);
+  let div = doc.children[0];
+  let count = 0;
+  for (const attr of div.attributes) {
+    if (attr.name === 'id') {
+      count++;
+      assert.equal(attr.value, 'a');
+    }
+  }
+  assert.ok(count === 1);
+})
+
+it('new line value', () => {
+  let doc = parseHTML(`<div id=
+"a"></div>`);
+  let div = doc.children[0];
+  let count = 0;
+  for (const attr of div.attributes) {
+    if (attr.name === 'id') {
+      count++;
+      assert.equal(attr.value, 'a');
+    }
+  }
+  assert.ok(count === 1);
+})
+
+it('equal mark is in the new line', () => {
+  let doc = parseHTML(`<div id
+="a"></div>`);
+  let div = doc.children[0];
+  let count = 0;
+  for (const attr of div.attributes) {
+    if (attr.name === 'id') {
+      count++;
+      assert.equal(attr.value, 'a');
+    }
+  }
+  assert.ok(count === 1);
+})
+
+it('EOF after value', () => {
+  let doc = parseHTML(`<div id="a"`);
+})
+
+it('double quotation in value', () => {
+  let doc = parseHTML(`<div id="a"b`);
+})
+
+it('self close after value without quote', () => {
+  let doc = parseHTML(`<div id=a/>`);
+})
+
+it('> after value without quote', () => {
+  let doc = parseHTML(`<div id=a></div>`);
+})
+
+it('not finish self close tag', () => {
+  let doc = parseHTML(`<div id=a/`);
+})
+
+it('wrong eng tag', () => {
+  try {
+    let doc = parseHTML(`<div>sdfsdf</>`);
+  } catch(e) {
+    assert.equal(e.message, "End Tag empty!");
+  }
+})
+
+it('wrong eng tag', () => {
+  let doc = parseHTML(`<div>sdfsdf</`);
+})
+
 it('script', () => {
   let content = `<script>
   <div>abcd</div>
@@ -108,8 +183,7 @@ it('script', () => {
   </scr
   </scri
   </scrip
-  </script
-  </script> `;
+  </script `;
   let doc = parseHTML(`<script>${content}</script>`);
   let text = doc.children[0].children[0];
   assert.equal(text.content, content);
@@ -133,4 +207,8 @@ it('attribute with no value2', () => {
 
 it('attribute with no value2', () => {
   let doc = parseHTML("<div/>");
+})
+
+it('uppercase tag name', () => {
+  let doc = parseHTML('<DIV/>')
 })

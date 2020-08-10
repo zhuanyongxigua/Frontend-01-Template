@@ -52,15 +52,14 @@ function emit(token){
 
 const EOF = Symbol("EOF");
 
-
 function data(c){
     if(c == "<") {
         return tagOpen;
-    } else if( c == EOF) {
+    } else if(c == EOF) {
         emit({
             type:"EOF"
         });
-        return ;
+        return;
     } else {
         emit({
             type:"text",
@@ -186,7 +185,7 @@ function singleQuotedAttributeValue(c) {
 }
 
 function afterQuotedAttributeValue (c){
-    if(c.match(/^[\t\n\f ]$/)) {
+    if(c.match && c.match(/^[\t\n\f ]$/)) {
         return beforeAttributeName;
     } else if(c == "/") {
         return selfClosingStartTag;
@@ -195,7 +194,8 @@ function afterQuotedAttributeValue (c){
         emit(currentToken);
         return data;
     } else if(c == EOF) {
-        
+        // ?
+        return afterQuotedAttributeValue;
     } else {
         currentAttribute.value += c;
         return doubleQuotedAttributeValue
@@ -204,7 +204,6 @@ function afterQuotedAttributeValue (c){
 
 
 function UnquotedAttributeValue(c) {
-
     if(c.match(/^[\t\n\f ]$/)) {
         currentToken[currentAttribute.name] = currentAttribute.value;
         return beforeAttributeName;
@@ -232,7 +231,7 @@ function selfClosingStartTag(c){
         currentToken.isSelfClosing = true;
         emit(currentToken);
         return data;
-    } else if(c == "EOF") {
+    } else if(c == EOF) {
 
     } else {
         
@@ -240,16 +239,17 @@ function selfClosingStartTag(c){
 }
 
 function endTagOpen(c){
-    if(c.match(/^[a-zA-Z]$/)) {
+    if(c.match && c.match(/^[a-zA-Z]$/)) {
         currentToken = {
             type: "endTag",
             tagName : ""
         }
         return tagName(c);
     } else if(c == ">") {
-
+        // ?
+        throw new Error("End Tag empty!");
     } else if(c == EOF) {
-        
+        return endTagOpen;
     } else {
 
     }
