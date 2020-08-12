@@ -17,11 +17,12 @@ function emit(token){
         element.tagName = token.tagName;
 
         for(let p in token) {
-            if(p != "type" || p != "tagName")
+            if(p != "type" || p != "tagName") {
                 element.attributes.push({
                     name: p,
                     value: token[p]
                 });
+            }
         }
 
         top.children.push(element);
@@ -113,27 +114,32 @@ function beforeAttributeName(c) {
     } else if(c == "/" || c == ">" || c == EOF) {
         return afterAttributeName(c);
     } else if(c == "=") {
-
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-equals-sign-before-attribute-name
+        throw new Error("Unexpected equals sign before attribute name");
     } else {
         currentAttribute = {
             name: "",
             value: ""
         }
-        //console.log("currentAttribute", currentAttribute)
         return attributeName(c);
     }
 }
 
 function attributeName(c) {
-    //console.log(currentAttribute);
-    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
+    if(c.match && c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
         return afterAttributeName(c);
     } else if(c == "=") {
         return beforeAttributeValue;
     } else if(c == "\u0000") {
-    
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-null-character
+        console.error('Unexpected NULL character!');
+        currentAttribute.name = '\u0000';
+        currentToken[currentAttribute.name] = '\uFFFD';
+        emit(currentToken);
+        return attributeName;
     } else if(c == "\"" || c == "'" || c == "<") {
-    
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-character-in-attribute-name
+        throw new Error('Unexpected character in attribute name!');
     } else {
         currentAttribute.name += c;
         return attributeName;
@@ -142,14 +148,17 @@ function attributeName(c) {
 
 
 function beforeAttributeValue(c) {
-    if(c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
+    if(c.match && c.match(/^[\t\n\f ]$/) || c == "/" || c == EOF) {
         return beforeAttributeValue;
     } else if(c == "\"") {
         return doubleQuotedAttributeValue;
     } else if(c == "\'") {
         return singleQuotedAttributeValue;
     } else if(c == ">") {
-        //return data;
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-missing-attribute-value
+        console.error('Missing attribute value!');
+        emit(currentToken);
+        return data;
     } else {
         return UnquotedAttributeValue(c);
     }
@@ -157,10 +166,17 @@ function beforeAttributeValue(c) {
 
 function doubleQuotedAttributeValue(c) {
     if(c == "\"") {
+        if (currentToken[currentAttribute.name] === '\uFFFD') {
+            currentAttribute.value = '\uFFFD';
+            return afterQuotedAttributeValue;
+        }
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if(c == "\u0000") {
-
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-null-character
+        console.error('Unexpected NULL character!');
+        currentToken[currentAttribute.name] = '\uFFFD';
+        return doubleQuotedAttributeValue;
     } else if(c == EOF) {
         
     } else {
@@ -172,12 +188,20 @@ function doubleQuotedAttributeValue(c) {
 
 function singleQuotedAttributeValue(c) {
     if(c == "\'") {
+        if (currentToken[currentAttribute.name] === '\uFFFD') {
+            currentAttribute.value = '\uFFFD';
+            return afterQuotedAttributeValue;
+        }
         currentToken[currentAttribute.name] = currentAttribute.value;
         return afterQuotedAttributeValue;
     } else if(c == "\u0000") {
-
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-null-character
+        console.error('Unexpected NULL character!');
+        currentToken[currentAttribute.name] = '\uFFFD';
+        return singleQuotedAttributeValue;
     } else if(c == EOF) {
-        
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-in-tag
+        throw new Error("Unexpected EOF in single quote value!");
     } else {
         currentAttribute.value += c;
         return singleQuotedAttributeValue
@@ -194,8 +218,8 @@ function afterQuotedAttributeValue (c){
         emit(currentToken);
         return data;
     } else if(c == EOF) {
-        // ?
-        return afterQuotedAttributeValue;
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-in-tag
+        throw new Error("Unexpected EOF after quote value!");
     } else {
         currentAttribute.value += c;
         return doubleQuotedAttributeValue
@@ -204,22 +228,42 @@ function afterQuotedAttributeValue (c){
 
 
 function UnquotedAttributeValue(c) {
-    if(c.match(/^[\t\n\f ]$/)) {
+    if(c.match && c.match(/^[\t\n\f ]$/)) {
+        if (currentToken[currentAttribute.name] === '\uFFFD') {
+            currentAttribute.value = '\uFFFD';
+            return beforeAttributeName;
+        }
         currentToken[currentAttribute.name] = currentAttribute.value;
         return beforeAttributeName;
     } else if(c == "/") {
+        if (currentToken[currentAttribute.name] === '\uFFFD') {
+            currentAttribute.value = '\uFFFD';
+            return selfClosingStartTag;
+        }
         currentToken[currentAttribute.name] = currentAttribute.value;
         return selfClosingStartTag;
     } else if(c == ">") {
+        if (currentToken[currentAttribute.name] === '\uFFFD') {
+            currentAttribute.value = '\uFFFD';
+            emit(currentToken);
+            return data;
+        }
         currentToken[currentAttribute.name] = currentAttribute.value;
         emit(currentToken);
         return data;
     } else if(c == "\u0000") {
-
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-null-character
+        console.error('Unexpected NULL character!');
+        currentToken[currentAttribute.name] = '\uFFFD';
+        return UnquotedAttributeValue;
     } else if(c == "\"" || c == "'" || c == "<" || c == "=" || c == "`") {
-
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-unexpected-character-in-unquoted-attribute-value
+        console.error('Unexpected character in unquoted attribute value!');
+        currentAttribute.value += c;
+        return UnquotedAttributeValue
     } else if(c == EOF) {
-        
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-in-tag
+        throw new Error("Unexpected EOF in unquote attribute value!");
     } else {
         currentAttribute.value += c;
         return UnquotedAttributeValue
@@ -231,8 +275,9 @@ function selfClosingStartTag(c){
         currentToken.isSelfClosing = true;
         emit(currentToken);
         return data;
-    } else if(c == EOF) {
-
+    } else if(c == EOF) { // test case "EOF after selfClosingTag '/'"
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-in-tag
+        throw new Error("Unexpected EOF in self close tag!");
     } else {
         
     }
@@ -246,17 +291,19 @@ function endTagOpen(c){
         }
         return tagName(c);
     } else if(c == ">") {
-        // ?
-        throw new Error("End Tag empty!");
-    } else if(c == EOF) {
-        return endTagOpen;
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-missing-end-tag-name
+        console.error('Missing end tag name!');
+        return data;
+    } else if(c == EOF) { // test case "EOF after '/'"
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-before-tag-name
+        throw new Error("Unexpected EOF in end tag!");
     } else {
 
     }
 }
+
 //in script
 function scriptData(c){
-    
     if(c == "<") {
         return scriptDataLessThanSign;
     } else {
@@ -267,6 +314,7 @@ function scriptData(c){
         return scriptData;
     }
 }
+
 //in script received <
 function scriptDataLessThanSign(c){
     if(c == "/") {
@@ -279,6 +327,7 @@ function scriptDataLessThanSign(c){
         return scriptData(c);
     }
 }
+
 //in script received </
 function scriptDataEndTagOpen(c){
     if(c == "s") {
@@ -297,6 +346,7 @@ function scriptDataEndTagOpen(c){
         return scriptData(c);
     }
 }
+
 //in script received </s
 function scriptDataEndTagNameS(c){
     if(c == "c") {
@@ -381,7 +431,7 @@ function scriptDataEndTag(c){
 }
 
 function afterAttributeName(c) {
-    if(c.match(/^[\t\n\f ]$/)) {
+    if(c.match && c.match(/^[\t\n\f ]$/)) {
         return afterAttributeName;
     } else if(c == "/") {
         return selfClosingStartTag;
@@ -392,7 +442,8 @@ function afterAttributeName(c) {
         emit(currentToken);
         return data;
     } else if(c == EOF) {
-        
+        // https://html.spec.whatwg.org/multipage/parsing.html#parse-error-eof-before-tag-name
+        throw new Error("Unexpected EOF after tag name!");
     } else {
         currentToken[currentAttribute.name] = currentAttribute.value;
         currentAttribute = {
