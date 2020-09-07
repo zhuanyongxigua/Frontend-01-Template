@@ -149,3 +149,67 @@ process.exit(1);
 我们是等待接收github的post请求。一般企业用的都是gitlab。这个比较难做，可能要一两个月。
 
 如果硬要写一个服务端的hook，就是写一个pre-receive的hook。
+
+# 重学前端week21第二节发布系统｜使用无头浏览器与DOM检查
+
+首先大部分时间在装东西，学习了ssh原来是有一个服务的，可能需要启动：
+
+```makefile
+sudo apt install openssh-server
+sudo service ssh start
+sudo service ssh status
+```
+
+然后为了防止虚拟机的ssh被防火墙阻断，所以还要设置一下，云端的也有可能，也需要设置防火墙什么的。
+
+virtualBox在setting的network的advance的Port Forwarding加一个规则，Host Post是2222，Guest Post用的22。
+
+在确保ssh是active的状态的情况下，用下面的命令尝试传个东西到linux：
+
+```make
+scp -P 2222 ./browser-sync.config.js yu@127.0.0.1:~
+```
+
+然后把server传到linux：
+
+```make
+scp -P 2222 -r ./server yu@127.0.0.1:~
+```
+
+想要在外面访问，还是要配置一个端口转发，同上，把3000转发到3000.
+
+然后可以配置一个域名，方法是修改本地的`/etc/hosts`。
+
+```make
+##
+# Host Database
+#
+# localhost is used to configure the loopback interface
+# when the system is booting.  Do not change this entry.
+##
+127.0.0.1 yuxinjs.io
+127.0.0.1	localhost
+255.255.255.255	broadcasthost
+::1             localhost
+
+106.186.114.44 www.vpncloud.me #vpncloud_generated
+106.186.114.44 vpncloud.me #vpncloud_generated
+106.186.30.32 www.ytpub.com #vpncloud_generated
+106.186.30.32 ytpub.com #vpncloud_generated
+106.186.30.32 www.yuntibit.com #vpncloud_generated
+106.186.30.32 yuntibit.com #vpncloud_generated
+```
+
+这个是搞着玩的。
+
+> 前端工作必要的流程有哪些？
+
+组件化，工具链，发布是一个前端工作的必要的流程的三个部分（也是三个工程体系，或者说是工程技能）。以后的晋升也是针对这几个方面来做的。
+
+面试就是挑这个人最擅长的东西，问到底，比如他说擅长js，那就按照知识体系问一波。
+
+搞定了一个领域，就是P7，比如持续集成，比如工具链。搞定了一个行业，就是P8。
+
+P6就是要把项目的一切问题解决。喷PM也是解决问题的一个方式。。。但是不推荐。
+
+如果leetcode已经不能满足了，可以去刷poj.org。
